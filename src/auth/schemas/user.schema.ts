@@ -8,9 +8,6 @@ export type UserDocument = User & Document;
   collection: 'users'
 })
 export class User {
-  @Prop({ required: true, index: true })
-  tenantId: string;
-
   @Prop({ required: true })
   email: string;
 

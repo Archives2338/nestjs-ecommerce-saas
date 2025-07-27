@@ -58,9 +58,6 @@ const CategoryListSchema = new MongooseSchema({
 
 @Schema({ timestamps: true })
 export class Catalog {
-  @Prop({ required: true, index: true })
-  tenantId: string;
-
   @Prop({ type: [ClassifyTabSchema], required: true })
   classify_tab: Record<string, any>[];
 

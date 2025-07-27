@@ -1,7 +1,6 @@
 import { Controller, Post, Body, Put, Param, Logger } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
 import { GetTypeClassifyListDto, UpdateCatalogDto } from './dto/catalog.dto';
-import { GetTenantId } from '../tenant/tenant.decorator';
 
 @Controller('index')
 export class CatalogController {
@@ -11,12 +10,11 @@ export class CatalogController {
 
   @Post('getTypeClassifyList')
   async getTypeClassifyList(
-    @Body() getTypeClassifyListDto: GetTypeClassifyListDto,
-    @GetTenantId() tenantId: string
+    @Body() getTypeClassifyListDto: GetTypeClassifyListDto
   ) {
     try {
-      this.logger.log(`Getting catalog for language: ${getTypeClassifyListDto.language} and tenant: ${tenantId}`);
-      const result = await this.catalogService.getTypeClassifyList(getTypeClassifyListDto, tenantId);
+      this.logger.log(`Getting catalog for language: ${getTypeClassifyListDto.language}`);
+      const result = await this.catalogService.getTypeClassifyList(getTypeClassifyListDto);
       this.logger.log('Catalog retrieved successfully');
       return result;
     } catch (error) {
@@ -28,12 +26,11 @@ export class CatalogController {
   @Put('catalog/:language')
   async updateCatalog(
     @Param('language') language: string,
-    @Body() updateCatalogDto: UpdateCatalogDto,
-    @GetTenantId() tenantId: string
+    @Body() updateCatalogDto: UpdateCatalogDto
   ) {
     try {
-      this.logger.log(`Updating catalog for language: ${language} and tenant: ${tenantId}`);
-      const result = await this.catalogService.updateCatalog(language, tenantId, updateCatalogDto);
+      this.logger.log(`Updating catalog for language: ${language}`);
+      const result = await this.catalogService.updateCatalog(language, updateCatalogDto);
       this.logger.log('Catalog updated successfully');
       return result;
     } catch (error) {
@@ -45,12 +42,11 @@ export class CatalogController {
   @Post('addRecentOrder/:productId')
   async addRecentOrder(
     @Param('productId') productId: number,
-    @Body() orderData: any,
-    @GetTenantId() tenantId: string
+    @Body() orderData: any
   ) {
     try {
-      this.logger.log(`Adding recent order for product: ${productId} in tenant: ${tenantId}`);
-      await this.catalogService.addRecentOrder(productId, tenantId, orderData);
+      this.logger.log(`Adding recent order for product: ${productId}`);
+      await this.catalogService.addRecentOrder(productId, orderData);
       this.logger.log('Recent order added successfully');
       return {
         code: 0,

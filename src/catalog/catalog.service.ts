@@ -13,18 +13,17 @@ export class CatalogService {
     @InjectModel(Catalog.name) private catalogModel: Model<CatalogDocument>,
   ) {}
 
-  async getTypeClassifyList(getTypeClassifyListDto: GetTypeClassifyListDto, tenantId: string) {
+  async getTypeClassifyList(getTypeClassifyListDto: GetTypeClassifyListDto) {
     try {
-      this.logger.log(`Searching for catalog with language: ${getTypeClassifyListDto.language} and tenantId: ${tenantId}`);
+      this.logger.log(`Searching for catalog with language: ${getTypeClassifyListDto.language}`);
       
       const catalog = await this.catalogModel.findOne({ 
-        language: getTypeClassifyListDto.language,
-        tenantId: tenantId
+        language: getTypeClassifyListDto.language
       }).exec();
 
       if (!catalog) {
         this.logger.log('No catalog found, creating default catalog');
-        return this.createDefaultCatalog(getTypeClassifyListDto.language, tenantId);
+        return this.createDefaultCatalog(getTypeClassifyListDto.language);
       }
 
       this.logger.log('Catalog found successfully');
@@ -53,10 +52,10 @@ export class CatalogService {
     }
   }
 
-  async updateCatalog(language: string, tenantId: string, updateData: UpdateCatalogDto) {
+  async updateCatalog(language: string, updateData: UpdateCatalogDto) {
     try {
       const updatedCatalog = await this.catalogModel.findOneAndUpdate(
-        { language, tenantId },
+        { language },
         updateData,
         { new: true, upsert: true }
       ).exec();
@@ -82,12 +81,12 @@ export class CatalogService {
     }
   }
 
-  async addRecentOrder(productId: number, tenantId: string, orderData: any) {
+  async addRecentOrder(productId: number, orderData: any) {
     try {
-      this.logger.log(`Adding recent order for product: ${productId} in tenant: ${tenantId}`);
+      this.logger.log(`Adding recent order for product: ${productId}`);
       
       // Buscar el catálogo y actualizar las órdenes recientes del producto específico
-      const catalog = await this.catalogModel.findOne({ tenantId }).exec();
+      const catalog = await this.catalogModel.findOne().exec();
       
       if (catalog) {
         // Buscar el producto en todas las categorías
@@ -112,9 +111,9 @@ export class CatalogService {
     }
   }
 
-  private async createDefaultCatalog(language: string, tenantId: string) {
+  private async createDefaultCatalog(language: string) {
     try {
-      this.logger.log(`Creating default catalog for language: ${language} and tenant: ${tenantId}`);
+      this.logger.log(`Creating default catalog for language: ${language}`);
       
       // Cargar datos mock desde archivo JSON
       const mockData = MockDataLoader.loadDefaultCatalog();
@@ -125,7 +124,6 @@ export class CatalogService {
 
       const defaultCatalog = new this.catalogModel({
         language,
-        tenantId,
         ...mockData
       });
 
