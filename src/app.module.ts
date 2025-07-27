@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { AuthModule } from './auth/auth.module';
+import { ContentModule } from './content/content.module';
 import { getDatabaseConfig } from './config/database.config';
 
 @Module({
@@ -20,6 +21,7 @@ import { getDatabaseConfig } from './config/database.config';
     ConfigModule,
     CatalogModule,
     AuthModule,
+    ContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
