@@ -1,0 +1,98 @@
+{
+  "subject_information": "Copyright © 2025 Tu E-commerce. Todos los derechos reservados.",
+  "navigation": [
+    {
+      "name": "PÁGINA DE INICIO",
+      "key_word": "head1",
+      "target_blank": 0,
+      "link_url": "/"
+    },
+    {
+      "name": "SOPORTE POSVENTA",
+      "key_word": "head3",
+      "target_blank": 0,
+      "link_url": "/support/ticketlist"
+    },
+    {
+      "name": "SUSCRIPCIÓN",
+      "key_word": "head4",
+      "target_blank": 0,
+      "link_url": "/subscription"
+    }
+  ],
+  "navigation_footer": [
+    {
+      "name": "Sobre nosotros",
+      "key_word": "footer1",
+      "target_blank": 0,
+      "link_url": "/about-us"
+    },
+    {
+      "name": "Contáctenos",
+      "key_word": "footer2",
+      "target_blank": 0,
+      "link_url": "/contact-us"
+    },
+    {
+      "name": "Centro de ayuda",
+      "key_word": "footer3",
+      "target_blank": 1,
+      "link_url": "/help"
+    }
+  ],
+  "user_center_menu": [
+    {
+      "name": "Mi perfil",
+      "key_word": "headMenu1",
+      "link_url": "/profile",
+      "link_rule": 0,
+      "is_block": 0,
+      "default_icon": "https://example.com/icon-profile.png",
+      "selected_icon": "https://example.com/icon-profile-selected.png"
+    },
+    {
+      "name": "Mis suscripciones",
+      "key_word": "headMenu2",
+      "link_url": "/subscription",
+      "link_rule": 0,
+      "is_block": 0,
+      "default_icon": "https://example.com/icon-subscription.png",
+      "selected_icon": "https://example.com/icon-subscription-selected.png"
+    },
+    {
+      "name": "Mis órdenes",
+      "key_word": "headMenu5",
+      "link_url": "/order",
+      "link_rule": 0,
+      "is_block": 0,
+      "default_icon": "https://example.com/icon-orders.png",
+      "selected_icon": "https://example.com/icon-orders-selected.png"
+    }
+  ],
+  "head_logo_b": {
+    "url": "https://example.com/logo.png",
+    "type": 0,
+    "not_theme_url": "https://example.com/logo-light.png",
+    "not_theme_type": 0,
+    "origin_type": 0
+  },
+  "netflix": {
+    "crisp_switch": 1,
+    "get_code": 0,
+    "appease_status": 0,
+    "affiliate_term": 1,
+    "netflix_change": 0,
+    "order_rank_rate": 20,
+    "user_country_status": 0,
+    "netflix_suspends_top": 0,
+    "netflix_suspends_middle": 0,
+    "spotify_fault_apply_status": 1,
+    "netflix_fault_apply_status": 1,
+    "spotify_service_guide_refund_credit": 1,
+    "netflix_service_guide_refund_credit": 1,
+    "netflix_vpn_check": 1,
+    "supply_update_status": 0,
+    "gamsai_divert_switch": 1,
+    "change_plan_style": 1
+  }
+}

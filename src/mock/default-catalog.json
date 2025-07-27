@@ -1,0 +1,109 @@
+{
+  "classify_tab": [
+    {
+      "id": 1,
+      "path": "all",
+      "name": "TODO",
+      "icon": "https://static.gamsgocdn.com/image/eced46969084319a7eaba87f4049fdd1.webp",
+      "icon_selected": "https://static.gamsgocdn.com/image/14fc175ddf6af484a4cf6392692cbeb7.webp"
+    },
+    {
+      "id": 2,
+      "path": "svod",
+      "name": "SVOD",
+      "icon": "https://static.gamsgocdn.com/image/9b6b60bd2333e45ff6ee0eece6cc9ae5.webp",
+      "icon_selected": "https://static.gamsgocdn.com/image/faeb12a8f840a41fa61385a411fd66bf.webp"
+    },
+    {
+      "id": 3,
+      "path": "music",
+      "name": "Música",
+      "icon": "https://static.gamsgocdn.com/image/1541fd2992cb00718053f1a79fdbb420.webp",
+      "icon_selected": "https://static.gamsgocdn.com/image/3567c9e309c7b19529e4975ce63ff7d3.webp"
+    },
+    {
+      "id": 4,
+      "path": "ai",
+      "name": "AI",
+      "icon": "https://static.gamsgocdn.com/image/41ce286b0cbdececbd8326b8fc377bf5.webp",
+      "icon_selected": "https://static.gamsgocdn.com/image/b6a042a08e661362183fb252be6b113a.webp"
+    },
+    {
+      "id": 5,
+      "path": "software",
+      "name": "Software",
+      "icon": "https://static.gamsgocdn.com/image/d2200c53da3ebbf5523c2a84ea97c95f.webp",
+      "icon_selected": "https://static.gamsgocdn.com/image/a30e52d22954386b7169a68adc86fb7f.webp"
+    }
+  ],
+  "statistics": {
+    "memberNum": 150000,
+    "peopleNum": 1200000,
+    "year": 6
+  },
+  "list": [
+    {
+      "id": 1,
+      "spuList": [
+        {
+          "id": 1,
+          "type_name": "Netflix",
+          "detail_route": "netflix",
+          "is_netflix": true,
+          "image": "https://static.gamsgocdn.com/image/9dbae2d076a256112ab6e8e2f9b764f1.webp",
+          "image_type": 1,
+          "thumb_img": "https://static.gamsgocdn.com/image/0f51929d358472fe7ab782257199e59d.webp",
+          "min_price": "4.53",
+          "currency_icon1": "$",
+          "currency_icon2": "USD($)",
+          "currency_show_type": 1,
+          "vip_status": 0,
+          "lock_status": 0,
+          "rank": 99,
+          "recent_order": [],
+          "description": [
+            "Renovar la misma suscripción de por vida",
+            "Mantenga todos sus favoritos y listas",
+            "Entrega en tiempo real",
+            "Compatible con Mac, teléfonos inteligentes, tabletas y dispositivos de TV",
+            "Garantía, garantía de reembolso."
+          ],
+          "prompt": []
+        },
+        {
+          "id": 2,
+          "type_name": "YouTube",
+          "detail_route": "youtube",
+          "is_netflix": false,
+          "image": "https://static.gamsgocdn.com/image/395063e196c5068d11e6d587f8876cf8.webp",
+          "image_type": 0,
+          "thumb_img": "https://static.gamsgocdn.com/image/b088efe87c27d91026b4fa6962242838.webp",
+          "min_price": "5.30",
+          "currency_icon1": "$",
+          "currency_icon2": "USD($)",
+          "currency_show_type": 1,
+          "vip_status": 0,
+          "lock_status": 0,
+          "rank": 73,
+          "recent_order": [
+            {
+              "out_trade_no": "9809175354504669",
+              "user_name": "to***81",
+              "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocKh73obuPUu0Vfz_EWFTtYFcpF4EkFlMgDbn7nY3OgcMJvQZbM=s96-c",
+              "create_time": "2025-07-26 15:50:46",
+              "show_status": 2,
+              "time": "11"
+            }
+          ],
+          "description": [
+            "YouTube Premium sin anuncios",
+            "Acceso a YouTube Music incluido",
+            "Descargas para ver sin conexión",
+            "Reproducción en segundo plano"
+          ],
+          "prompt": []
+        }
+      ]
+    }
+  ]
+}
