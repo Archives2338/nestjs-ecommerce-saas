@@ -388,4 +388,90 @@ export class ContentController {
       };
     }
   }
+
+  /**
+   * Endpoint para cargar contenido español con soporte de active flags
+   * POST /api/content/update-spanish-with-active
+   */
+  @Post('content/update-spanish-with-active')
+  async updateSpanishContentWithActiveFlags() {
+    try {
+      this.logger.log('Updating Spanish content with active flags support');
+      const result = await this.contentService.updateSpanishContentWithActiveFlags();
+      return result;
+      
+    } catch (error) {
+      this.logger.error('Error in update-spanish-with-active endpoint:', error);
+      return {
+        code: 1,
+        message: 'Error al actualizar contenido español con active flags',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Endpoint para cargar contenido inglés con soporte de active flags
+   * POST /api/content/update-english-with-active
+   */
+  @Post('content/update-english-with-active')
+  async updateEnglishContentWithActiveFlags() {
+    try {
+      this.logger.log('Updating English content with active flags support');
+      const result = await this.contentService.updateEnglishContentWithActiveFlags();
+      return result;
+      
+    } catch (error) {
+      this.logger.error('Error in update-english-with-active endpoint:', error);
+      return {
+        code: 1,
+        message: 'Error updating English content with active flags',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Endpoint para activar/desactivar una clave específica
+   * PUT /api/content/toggle-active/:language/:section/:key
+   */
+  @Put('content/toggle-active/:language/:section/:key')
+  async toggleActiveFlag(
+    @Param('language') language: string,
+    @Param('section') section: string,
+    @Param('key') key: string,
+    @Body() body: { active: boolean }
+  ) {
+    try {
+      this.logger.log(`Toggling active flag for ${language}/${section}/${key} to ${body.active}`);
+      
+      const result = await this.contentService.toggleContentKeyActive(language, section, key, body.active);
+      
+      return {
+        code: 0,
+        message: `Clave ${key} ${body.active ? 'activada' : 'desactivada'} exitosamente`,
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: result
+      };
+      
+    } catch (error) {
+      this.logger.error('Error toggling active flag:', error);
+      return {
+        code: 1,
+        message: 'Error al cambiar estado activo',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
 }

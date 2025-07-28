@@ -1,17 +1,28 @@
-# NestJS E-commerce Backend
+# NestJS E-commerce SaaS Backend
 
-E-commerce backend básico construido con NestJS, MongoDB y JWT.
+Backend SaaS especializado en **venta y gestión de cuentas de servicios de streaming** (Netflix, Spotify, YouTube Premium, etc.) construido con NestJS, MongoDB y JWT.
 
-## 🚀 Características
+## 🎯 **Estado Actual - Fase 1 Completada ✅**
 
-- ✅ Autenticación JWT
-- ✅ Gestión de catálogo de productos
-- ✅ Sistema de configuración del sitio
-- ✅ API REST completa
-- ✅ Base de datos MongoDB
-- ✅ Validación de datos con DTOs
-- ✅ Logging estructurado
-- ✅ Email service para notificaciones
+Sistema **funcionando y listo para producción** con API compatible al 100% con referencias externas.
+
+## 🚀 Características Implementadas
+
+- ✅ **API getSkuList**: Endpoint compatible con API de referencia externa
+- ✅ **Gestión de Servicios**: Netflix completo con planes y precios dinámicos
+- ✅ **Validación Robusta**: DTOs con validación completa de datos
+- ✅ **Base de datos MongoDB**: Schemas optimizados para servicios de streaming
+- ✅ **Seed Scripts**: Datos de Netflix listos para usar
+- ✅ **Logging estructurado**: Monitoreo completo de requests y errores
+- ✅ **Autenticación JWT**: Sistema de auth preparado
+- ✅ **Sistema multi-idioma**: Soporte para español e inglés
+
+## 📋 **Roadmap Evolutivo**
+
+- 📖 **[Ver Roadmap Completo](./ROADMAP.md)** - Plan detallado de mejoras futuras
+- 🔄 **Fase 2**: Arquitectura dinámica con `month_id` y `screen_id`
+- 🔐 **Fase 3**: Gestión avanzada de inventario de cuentas
+- 🎨 **Fase 4**: Panel de administración web
 
 ## 📦 Instalación
 
@@ -52,25 +63,53 @@ npm run start:prod
 
 # Build
 npm run build
+
+# Poblar datos de ejemplo (Netflix)
+npm run seed:services
+```
+
+## 🧪 **Probar la API Actual**
+
+### 🎬 **Netflix getSkuList API** (Principal)
+```bash
+curl -X POST http://localhost:3000/api/index/getSkuList \
+  -H "Content-Type: application/json" \
+  -d '{
+    "language": "es",
+    "type_id": 1,
+    "source": 1
+  }'
+```
+
+**Respuesta esperada**: Netflix con todos los planes, precios y opciones de pantalla
+
+### ✅ **Health Check**
+```bash
+curl http://localhost:3000/
 ```
 
 ## 📚 API Endpoints
 
-### Salud del Sistema
-- `GET /` - Health check
+### 🎯 **Servicios de Streaming (Principal)**
+- `POST /api/index/getSkuList` - **API PRINCIPAL** - Obtener detalles de servicio con planes y precios
+- `GET /api/services/:language` - Listar todos los servicios
+- `POST /api/services` - Crear nuevo servicio
+- `PUT /api/services/:language/:id` - Actualizar servicio
+- `DELETE /api/services/:language/:id` - Eliminar servicio
 
-### Autenticación
+### 🔐 **Autenticación**
 - `POST /authorize/sign_process` - Login de usuario
 - `POST /authorize/code_sign` - Verificación de código
 
-### Catálogo de Productos
+### 📦 **Catálogo y Configuración**
 - `POST /index/getTypeClassifyList` - Obtener catálogo de productos
-- `PUT /index/catalog/:language` - Actualizar catálogo
-- `POST /index/addRecentOrder/:productId` - Agregar orden reciente
-
-### Configuración del Sitio
 - `POST /index/siteConfig` - Obtener configuración del sitio
 - `PUT /index/siteConfig/:language` - Actualizar configuración
+
+### 📄 **Gestión de Contenido**
+- `GET /api/webpage/:language` - Obtener contenido de página
+- `PUT /api/webpage/:language/:section` - Actualizar sección
+- `GET /api/webpage/languages` - Idiomas disponibles
 
 ## 🌟 Versión SaaS Multi-Tenant
 

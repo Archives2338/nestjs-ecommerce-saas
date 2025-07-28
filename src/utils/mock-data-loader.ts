@@ -40,8 +40,26 @@ export class MockDataLoader {
     }
   }
 
+  static loadContentDataFromFile(filename: string): any {
+    try {
+      const filePath = path.join(this.mockPath, filename);
+      console.log(`Attempting to load content from specific file: ${filePath}`);
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      const parsed = JSON.parse(fileContent);
+      console.log(`Successfully loaded content from ${filename} with ${Object.keys(parsed.content || {}).length} sections`);
+      return parsed;
+    } catch (error) {
+      console.error(`Error loading content mock data from file ${filename}:`, error);
+      return null;
+    }
+  }
+
   // Métodos de instancia para compatibilidad
   loadContentData(language: string): any {
     return MockDataLoader.loadContentData(language);
+  }
+
+  loadContentDataFromFile(filename: string): any {
+    return MockDataLoader.loadContentDataFromFile(filename);
   }
 }

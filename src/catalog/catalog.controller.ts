@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Logger, HttpCode, HttpStatus } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
 import { GetTypeClassifyListDto, UpdateCatalogDto } from './dto/catalog.dto';
 
@@ -9,6 +9,7 @@ export class CatalogController {
   constructor(private readonly catalogService: CatalogService) {}
 
   @Post('getTypeClassifyList')
+  @HttpCode(HttpStatus.OK)
   async getTypeClassifyList(
     @Body() getTypeClassifyListDto: GetTypeClassifyListDto
   ) {
@@ -40,6 +41,7 @@ export class CatalogController {
   }
 
   @Post('addRecentOrder/:productId')
+  @HttpCode(HttpStatus.OK)
   async addRecentOrder(
     @Param('productId') productId: number,
     @Body() orderData: any

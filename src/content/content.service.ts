@@ -15,9 +15,9 @@ export class ContentService {
 
   async getWebpageContent(getWebpageContentDto: GetWebpageContentDto) {
     try {
-      const { key: requestedKeys, language } = getWebpageContentDto;
+      const { key: requestedSections, language } = getWebpageContentDto;
       
-      this.logger.log(`Getting webpage content for language: ${language}, keys: ${requestedKeys.length}`);
+      this.logger.log(`Getting webpage content for language: ${language}, sections: ${requestedSections.join(', ')}`);
 
       // Buscar contenido en la base de datos
       let webpageContent = await this.webpageContentModel.findOne({
@@ -36,8 +36,8 @@ export class ContentService {
         throw new Error(`Could not load or create content for language: ${language}`);
       }
 
-      // Filtrar contenido según las keys solicitadas
-      const filteredContent = this.filterContentByKeys(webpageContent.content, requestedKeys);
+      // Filtrar contenido según las secciones solicitadas
+      const filteredContent = this.filterContentBySections(webpageContent.content, requestedSections);
 
       // Procesar parámetros dinámicos
       const processedContent = this.processContentParams(filteredContent);
@@ -246,30 +246,268 @@ export class ContentService {
     return defaultContent;
   }
 
-  private filterContentByKeys(content: Record<string, any>, requestedKeys: string[]): Record<string, any> {
+  async createContentFromMock(mockData: any): Promise<WebpageContentDocument> {
+    try {
+      this.logger.log(`Creating content from mock data for language: ${mockData.language}`);
+
+      // Eliminar contenido existente SOLO para este idioma específico
+      await this.webpageContentModel.deleteMany({ language: mockData.language });
+
+      // Crear nuevo contenido solo para el idioma especificado
+      const newContent = new this.webpageContentModel({
+        language: mockData.language,
+        content: mockData.content,
+        version: mockData.version || 1,
+        metadata: {
+          totalSections: Object.keys(mockData.content).length,
+          totalKeys: this.countTotalKeys(mockData.content),
+          lastSyncAt: new Date(),
+          sourceVersion: mockData.metadata?.sourceVersion || '1.0.0'
+        },
+        isActive: true
+      });
+
+      const savedContent = await newContent.save();
+      this.logger.log(`Content created successfully for language: ${mockData.language} with ${Object.keys(mockData.content).length} sections`);
+      
+      return savedContent;
+
+    } catch (error) {
+      this.logger.error('Error creating content from mock data:', error);
+      throw error;
+    }
+  }
+
+  async updateSpanishContentOnly(): Promise<any> {
+    try {
+      this.logger.log('Updating ONLY Spanish content, preserving other languages');
+
+      // Cargar contenido español desde archivo mock
+      const mockDataLoader = new MockDataLoader();
+      const spanishContent = mockDataLoader.loadContentData('es');
+      
+      if (!spanishContent) {
+        throw new Error('Could not load Spanish content from JSON file');
+      }
+
+      // Eliminar SOLO contenido español existente
+      const deleteResult = await this.webpageContentModel.deleteMany({ language: 'es' });
+      this.logger.log(`Deleted ${deleteResult.deletedCount} Spanish documents`);
+
+      // Crear nuevo contenido español
+      const result = await this.createContentFromMock(spanishContent);
+      
+      return {
+        code: 0,
+        message: 'Contenido español actualizado exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: {
+          sectionsCreated: Object.keys(spanishContent.content).length,
+          totalKeys: result.metadata?.totalKeys || 0,
+          version: spanishContent.version,
+          deletedDocuments: deleteResult.deletedCount
+        }
+      };
+      
+    } catch (error) {
+      this.logger.error('Error updating Spanish content only:', error);
+      return {
+        code: 1,
+        message: 'Error al actualizar contenido español',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  async updateSpanishContentWithActiveFlags(): Promise<any> {
+    try {
+      this.logger.log('Updating Spanish content with active flags support');
+
+      // Cargar contenido español con active flags desde archivo mock
+      const mockDataLoader = new MockDataLoader();
+      const spanishContent = mockDataLoader.loadContentDataFromFile('default-content-es-with-active.json');
+      
+      if (!spanishContent) {
+        throw new Error('Could not load Spanish content with active flags from JSON file');
+      }
+
+      // Eliminar SOLO contenido español existente
+      const deleteResult = await this.webpageContentModel.deleteMany({ language: 'es' });
+      this.logger.log(`Deleted ${deleteResult.deletedCount} Spanish documents`);
+
+      // Crear nuevo contenido español con active flags
+      const result = await this.createContentFromMock(spanishContent);
+      
+      return {
+        code: 0,
+        message: 'Contenido español con active flags actualizado exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: {
+          sectionsCreated: Object.keys(spanishContent.content).length,
+          totalKeys: result.metadata?.totalKeys || 0,
+          version: spanishContent.version,
+          deletedDocuments: deleteResult.deletedCount,
+          supportsActiveFlags: true
+        }
+      };
+      
+    } catch (error) {
+      this.logger.error('Error updating Spanish content with active flags:', error);
+      return {
+        code: 1,
+        message: 'Error al actualizar contenido español con active flags',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  async updateEnglishContentWithActiveFlags(): Promise<any> {
+    try {
+      this.logger.log('Updating English content with active flags support');
+
+      // Cargar contenido inglés con active flags desde archivo mock
+      const mockDataLoader = new MockDataLoader();
+      const englishContent = mockDataLoader.loadContentDataFromFile('default-content-en-with-active.json');
+      
+      if (!englishContent) {
+        throw new Error('Could not load English content with active flags from JSON file');
+      }
+
+      // Eliminar SOLO contenido inglés existente
+      const deleteResult = await this.webpageContentModel.deleteMany({ language: 'en' });
+      this.logger.log(`Deleted ${deleteResult.deletedCount} English documents`);
+
+      // Crear nuevo contenido inglés con active flags
+      const result = await this.createContentFromMock(englishContent);
+      
+      return {
+        code: 0,
+        message: 'English content with active flags updated successfully',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: {
+          sectionsCreated: Object.keys(englishContent.content).length,
+          totalKeys: result.metadata?.totalKeys || 0,
+          version: englishContent.version,
+          deletedDocuments: deleteResult.deletedCount,
+          supportsActiveFlags: true
+        }
+      };
+      
+    } catch (error) {
+      this.logger.error('Error updating English content with active flags:', error);
+      return {
+        code: 1,
+        message: 'Error updating English content with active flags',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  async toggleContentKeyActive(language: string, section: string, key: string, active: boolean): Promise<any> {
+    try {
+      this.logger.log(`Toggling active flag for ${language}/${section}/${key} to ${active}`);
+
+      // Buscar el documento de contenido
+      const content = await this.webpageContentModel.findOne({
+        language,
+        isActive: true
+      }).exec();
+
+      if (!content) {
+        throw new Error(`Content not found for language: ${language}`);
+      }
+
+      // Verificar que la sección existe
+      if (!content.content[section]) {
+        throw new Error(`Section '${section}' not found in content`);
+      }
+
+      // Verificar que la clave existe
+      if (!content.content[section][key]) {
+        throw new Error(`Key '${key}' not found in section '${section}'`);
+      }
+
+      // Actualizar el flag active
+      const currentValue = content.content[section][key];
+      if (typeof currentValue === 'object' && currentValue !== null && 'text' in currentValue) {
+        // Formato con active flag
+        content.content[section][key] = {
+          ...currentValue,
+          active: active
+        };
+      } else {
+        // Convertir formato legacy a nuevo formato
+        content.content[section][key] = {
+          text: currentValue as string,
+          active: active
+        };
+      }
+
+      // Marcar como modificado y guardar
+      content.markModified('content');
+      content.updatedAt = new Date();
+      const savedContent = await content.save();
+
+      return {
+        section,
+        key,
+        active,
+        text: typeof currentValue === 'object' ? (currentValue as any).text : currentValue,
+        updatedAt: savedContent.updatedAt
+      };
+
+    } catch (error) {
+      this.logger.error('Error toggling content key active flag:', error);
+      throw error;
+    }
+  }
+
+  private filterContentBySections(content: Record<string, any>, requestedSections: string[]): Record<string, any> {
     const filtered: Record<string, any> = {};
     
-    // Buscar en cada sección del contenido
-    for (const [sectionKey, sectionValue] of Object.entries(content)) {
-      if (sectionValue && typeof sectionValue === 'object') {
-        const sectionResult: Record<string, any> = {};
-        let hasMatchingKeys = false;
+    // Filtrar solo las secciones solicitadas
+    for (const sectionName of requestedSections) {
+      if (content[sectionName]) {
+        const section = content[sectionName];
+        const filteredSection: Record<string, any> = {};
         
-        // Buscar claves solicitadas en esta sección
-        for (const requestedKey of requestedKeys) {
-          if ((sectionValue as any)[requestedKey] !== undefined) {
-            sectionResult[requestedKey] = (sectionValue as any)[requestedKey];
-            hasMatchingKeys = true;
+        // Filtrar solo claves activas
+        for (const [key, value] of Object.entries(section)) {
+          if (key === 'params') {
+            // Siempre incluir params
+            filteredSection[key] = value;
+          } else if (typeof value === 'object' && value !== null && 'active' in value) {
+            // Nuevo formato con active flag
+            const contentItem = value as { text: string; active: boolean };
+            if (contentItem.active === true) {
+              filteredSection[key] = contentItem.text;
+            }
+          } else if (typeof value === 'string') {
+            // Formato legacy - incluir todo
+            filteredSection[key] = value;
           }
         }
         
-        // Si hay claves coincidentes, incluir la sección con sus parámetros
-        if (hasMatchingKeys) {
-          if ((sectionValue as any).params) {
-            sectionResult.params = (sectionValue as any).params;
-          }
-          filtered[sectionKey] = sectionResult;
-        }
+        filtered[sectionName] = filteredSection;
+      } else {
+        // Si la sección no existe, crear una sección vacía para evitar errores
+        this.logger.warn(`Section '${sectionName}' not found in content`);
+        filtered[sectionName] = {};
       }
     }
     

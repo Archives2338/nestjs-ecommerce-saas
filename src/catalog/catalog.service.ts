@@ -25,7 +25,7 @@ export class CatalogService {
         this.logger.log('No catalog found, creating default catalog');
         return this.createDefaultCatalog(getTypeClassifyListDto.language);
       }
-
+      console.log(catalog);
       this.logger.log('Catalog found successfully');
       return {
         code: 0,

@@ -1,0 +1,24 @@
+{
+  "service_id": 4,
+  "service_name": "Spotify",
+  "account_type": "shared",
+  "credentials": {
+    "email": "spotify.premium01@example.com",
+    "password": "SecurePass123!",
+    "profile_name": "Premium Account"
+  },
+  "slot_info": {
+    "max_slots": 5,
+    "used_slots": 0,
+    "assigned_to": []
+  },
+  "plan_type": "12 meses Familia",
+  "subscription_expires_at": "2025-07-27T23:59:59.000Z",
+  "notes": "Cuenta premium compartida para hasta 5 usuarios",
+  "metadata": {
+    "country": "US",
+    "region": "Global",
+    "quality": "320kbps",
+    "features": ["Premium", "Ad-free", "Offline download", "Cross-platform"]
+  }
+}

@@ -10,6 +10,7 @@
     "test": "jest",
     "test:e2e": "jest --config test/jest-e2e.json",
     "seed:tenants": "ts-node src/scripts/seed-tenants.ts",
+    "seed:services": "ts-node src/scripts/seed-services.ts",
     "kill:ports": "./scripts/kill-nestjs.sh",
     "restart": "./scripts/kill-nestjs.sh && npm run start:dev"
   },
@@ -21,7 +22,8 @@
     "@nestjs/mongoose": "^9.2.2",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.4.3",
-    "bcrypt": "^5.0.0",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",

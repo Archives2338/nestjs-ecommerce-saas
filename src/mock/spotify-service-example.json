@@ -1,0 +1,340 @@
+{
+  "language": "es",
+  "id": 4,
+  "show_status": 1,
+  "type_name": "Spotify",
+  "thumb_img": "https://static.gamsgocdn.com/image/8ceb07a447848f24332c4999bf8257c5.webp",
+  "selectInfo": "Seleccionar tipo",
+  "sku_style_status": false,
+  "plan": {
+    "month": [
+      {
+        "month_id": 18,
+        "month": 6,
+        "month_content": "6 meses",
+        "screen": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 254,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "49.99",
+            "sale_price": "19.99",
+            "average_price": "3.33",
+            "discount": "0.6001"
+          }
+        ]
+      },
+      {
+        "month_id": 24,
+        "month": 12,
+        "month_content": "12 meses",
+        "screen": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 84,
+            "max_user": 5,
+            "substitute_recharge": 1,
+            "screen": 1,
+            "screen_content": "Recargar",
+            "seat_type": "con tu propia cuenta",
+            "type_plan_id": 367,
+            "sort": 5,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.99",
+            "sale_price": "34.99",
+            "average_price": "2.92",
+            "discount": "0.5626"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 249,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.98",
+            "sale_price": "29.99",
+            "average_price": "2.50",
+            "discount": "0.6250"
+          }
+        ]
+      }
+    ],
+    "screen": [
+      {
+        "screen_id": 84,
+        "max_user": 5,
+        "substitute_recharge": 1,
+        "screen": 1,
+        "screen_content": "Recargar",
+        "seat_type": "con tu propia cuenta",
+        "sort": 5,
+        "month": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 84,
+            "max_user": 5,
+            "substitute_recharge": 1,
+            "screen": 1,
+            "screen_content": "Recargar",
+            "seat_type": "con tu propia cuenta",
+            "type_plan_id": 367,
+            "sort": 5,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.99",
+            "sale_price": "34.99",
+            "average_price": "2.92",
+            "discount": "0.5626"
+          }
+        ]
+      },
+      {
+        "screen_id": 65,
+        "max_user": 1,
+        "substitute_recharge": 0,
+        "screen": 1,
+        "screen_content": "1 ranura",
+        "seat_type": "Personal",
+        "sort": 7,
+        "month": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 254,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "49.99",
+            "sale_price": "19.99",
+            "average_price": "3.33",
+            "discount": "0.6001"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 249,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.98",
+            "sale_price": "29.99",
+            "average_price": "2.50",
+            "discount": "0.6250"
+          }
+        ]
+      }
+    ]
+  },
+  "repayment": {
+    "month": [
+      {
+        "month_id": 18,
+        "month": 6,
+        "month_content": "6 meses",
+        "screen": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 254,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "49.99",
+            "sale_price": "18.99",
+            "average_price": "3.17",
+            "discount": "0.6201"
+          }
+        ]
+      },
+      {
+        "month_id": 24,
+        "month": 12,
+        "month_content": "12 meses",
+        "screen": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 84,
+            "max_user": 5,
+            "substitute_recharge": 1,
+            "screen": 1,
+            "screen_content": "Recargar",
+            "seat_type": "con tu propia cuenta",
+            "type_plan_id": 367,
+            "sort": 5,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.99",
+            "sale_price": "33.99",
+            "average_price": "2.83",
+            "discount": "0.5751"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 249,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.98",
+            "sale_price": "28.99",
+            "average_price": "2.42",
+            "discount": "0.6375"
+          }
+        ]
+      }
+    ],
+    "screen": [
+      {
+        "screen_id": 84,
+        "max_user": 5,
+        "substitute_recharge": 1,
+        "screen": 1,
+        "screen_content": "Recargar",
+        "seat_type": "con tu propia cuenta",
+        "sort": 5,
+        "month": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 84,
+            "max_user": 5,
+            "substitute_recharge": 1,
+            "screen": 1,
+            "screen_content": "Recargar",
+            "seat_type": "con tu propia cuenta",
+            "type_plan_id": 367,
+            "sort": 5,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.99",
+            "sale_price": "33.99",
+            "average_price": "2.83",
+            "discount": "0.5751"
+          }
+        ]
+      },
+      {
+        "screen_id": 65,
+        "max_user": 1,
+        "substitute_recharge": 0,
+        "screen": 1,
+        "screen_content": "1 ranura",
+        "seat_type": "Personal",
+        "sort": 7,
+        "month": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 254,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "49.99",
+            "sale_price": "18.99",
+            "average_price": "3.17",
+            "discount": "0.6201"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 65,
+            "max_user": 1,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 ranura",
+            "seat_type": "Personal",
+            "type_plan_id": 249,
+            "sort": 7,
+            "currency_icon1": "$",
+            "currency_icon2": "USD($)",
+            "currency_show_type": 1,
+            "original_price": "79.98",
+            "sale_price": "28.99",
+            "average_price": "2.42",
+            "discount": "0.6375"
+          }
+        ]
+      }
+    ]
+  },
+  "isActive": true,
+  "metadata": {
+    "category": "Music Streaming",
+    "region": "Global",
+    "supportedDevices": ["iOS", "Android", "Web", "Desktop"],
+    "totalPlans": 4
+  }
+}
