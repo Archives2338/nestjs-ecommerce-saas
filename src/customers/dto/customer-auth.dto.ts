@@ -26,8 +26,8 @@ export class VerifyCodeDto {
   email: string;
 
   @IsString({ message: 'Código debe ser una cadena' })
-  @Length(6, 6, { message: 'Código debe tener 6 dígitos' })
-  @Matches(/^\d{6}$/, { message: 'Código debe contener solo números' })
+  @Length(4, 4, { message: 'Código debe tener 4 dígitos' })
+  @Matches(/^\d{4}$/, { message: 'Código debe contener solo números' })
   code: string;
 }
 

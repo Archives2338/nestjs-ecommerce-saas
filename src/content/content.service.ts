@@ -186,16 +186,23 @@ export class ContentService {
 
   private getDefaultContentStructure(language: string) {
     try {
-      // Intentar cargar contenido desde archivo mock
-      this.logger.log(`Attempting to load mock content for language: ${language}`);
+      // Intentar cargar contenido desde archivo mock con flags activos
+      this.logger.log(`Attempting to load mock content with active flags for language: ${language}`);
       const mockDataLoader = new MockDataLoader();
-      const mockContent = mockDataLoader.loadContentData(language);
+      const mockContent = mockDataLoader.loadContentDataFromFile(`default-content-${language}-with-active.json`);
       
       if (mockContent && mockContent.content) {
-        this.logger.log(`Successfully loaded mock content for language: ${language} with ${Object.keys(mockContent.content).length} sections`);
+        this.logger.log(`Successfully loaded mock content with active flags for language: ${language} with ${Object.keys(mockContent.content).length} sections`);
         return mockContent.content;
       } else {
-        this.logger.warn(`Mock content is empty or invalid for language: ${language}`);
+        this.logger.warn(`Mock content with active flags is empty or invalid for language: ${language}, trying fallback`);
+        
+        // Fallback: intentar cargar contenido legacy
+        const legacyContent = mockDataLoader.loadContentData(language);
+        if (legacyContent && legacyContent.content) {
+          this.logger.log(`Successfully loaded legacy mock content for language: ${language}`);
+          return legacyContent.content;
+        }
       }
     } catch (error) {
       this.logger.error(`Failed to load mock content for language ${language}:`, error instanceof Error ? error.message : error);

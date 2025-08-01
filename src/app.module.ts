@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { ContentModule } from './content/content.module';
 import { ServicesModule } from './services/services.module';
 import { CustomerAuthModule } from './customers/customer-auth.module';
+import { OrdersModule } from './orders/orders.module';
 import { getDatabaseConfig } from './config/database.config';
 
 @Module({
@@ -26,6 +27,7 @@ import { getDatabaseConfig } from './config/database.config';
     ContentModule,
     ServicesModule,
     CustomerAuthModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

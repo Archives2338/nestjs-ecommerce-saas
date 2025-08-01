@@ -38,7 +38,7 @@ export class CustomerAuthController {
   // ============================================
 
   /**
-   * PASO 1: Verificar email y enviar código
+   * PASO 1: Verificar email 
    * POST /api/customer/auth/check-email
    */
   @Post('check-email')
@@ -46,14 +46,29 @@ export class CustomerAuthController {
   async checkEmail(@Body(ValidationPipe) checkEmailDto: CheckEmailDto) {
     this.logger.log(`Email check for: ${checkEmailDto.email}`);
     
-    const result = await this.customerAuthService.checkEmailAndSendCode(checkEmailDto);
+    const result = await this.customerAuthService.checkEmail(checkEmailDto);
     
     this.logger.log(`Email check result: ${result.code === 0 ? 'SUCCESS' : 'FAILED'}`);
     return result;
   }
 
   /**
-   * PASO 2: Verificar código de registro
+   * PASO 2: Enviar código de verificación
+   * POST /api/customer/auth/send-code
+   */
+  @Post('send-code')
+  @HttpCode(HttpStatus.OK)
+  async sendCode(@Body(ValidationPipe) checkEmailDto: CheckEmailDto) {
+    this.logger.log(`Sending verification code to: ${checkEmailDto.email}`);
+    
+    const result = await this.customerAuthService.sendRegistrationCode(checkEmailDto);
+    
+    this.logger.log(`Send code result: ${result.code === 0 ? 'SUCCESS' : 'FAILED'}`);
+    return result;
+  }
+
+  /**
+   * PASO 3: Verificar código de registro
    * POST /api/customer/auth/verify-code
    */
   @Post('verify-code')
@@ -68,7 +83,7 @@ export class CustomerAuthController {
   }
 
   /**
-   * PASO 3: Completar registro con contraseña
+   * PASO 4: Completar registro con contraseña
    * POST /api/customer/auth/complete-registration
    */
   @Post('complete-registration')

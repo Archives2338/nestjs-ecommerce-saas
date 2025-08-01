@@ -46,6 +46,30 @@
       "id": 1,
       "spuList": [
         {
+          "id": 10,
+          "type_name": "Disney+",
+          "detail_route": "disneyplus",
+          "is_netflix": false,
+          "image": "https://static.gamsgocdn.com/image/dd3ccaa4b722349e652071d2d3f55ef7.webp",
+          "image_type": 0,
+          "thumb_img": "https://static.gamsgocdn.com/image/dc3267eba3a0779df555d940a2a9eed9.webp",
+          "min_price": "10.28",
+          "currency_icon1": "S/",
+          "currency_icon2": "PEN(S/)",
+          "currency_show_type": 1,
+          "vip_status": 0,
+          "lock_status": 0,
+          "rank": 85,
+          "recent_order": [],
+          "description": [
+            "Admite opciones de reproducción de alta calidad, como resolución 4K, HDR y Dolby Vision para una experiencia de visualización cercana al cine.",
+            "Clasificaciones de contenido: 18+/R18(21)/TV-MA",
+            "Admite múltiples dispositivos: teléfono móvil, computadora, TV",
+            "Soporte posventa, reembolso sin preocupaciones"
+          ],
+          "prompt": []
+        },
+        {
           "id": 1,
           "type_name": "Netflix",
           "detail_route": "netflix",

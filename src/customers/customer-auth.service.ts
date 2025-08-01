@@ -31,13 +31,12 @@ export class CustomerAuthService {
   ) {}
 
   /**
-   * NUEVO FLUJO: Paso 1 - Verificar email y enviar código
+   * NUEVO FLUJO: Paso 1 - Verificar email
    */
-  async checkEmailAndSendCode(checkEmailDto: CheckEmailDto): Promise<CustomerAuthResponse> {
+  async checkEmail(checkEmailDto: CheckEmailDto): Promise<CustomerAuthResponse> {
     try {
       const { email } = checkEmailDto;
       this.logger.log(`Checking email and sending verification code: ${email}`);
-
       // Verificar si el email ya existe
       const existingCustomer = await this.customerModel.findOne({ 
         email: email.toLowerCase() 
@@ -56,8 +55,66 @@ export class CustomerAuthService {
       }
 
       // Generar código de 6 dígitos
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      // const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+      // // Eliminar códigos anteriores del mismo email
+      // await this.verificationCodeModel.deleteMany({ 
+      //   email: email.toLowerCase(),
+      //   type: 'registration'
+      // });
+
+      // // Crear nuevo código de verificación
+      // const newCode = new this.verificationCodeModel({
+      //   email: email.toLowerCase(),
+      //   code: verificationCode,
+      //   type: 'registration',
+      //   expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutos
+      // });
+
+      // await newCode.save();
+
+      // // TODO: Enviar email con el código
+      // this.logger.log(`Verification code generated for ${email}: ${verificationCode}`);
+      
+      return {
+        code: 0,
+        message: 'Email no registrado.',
+        toast: 0,
+        redirect_url: '/verify-code',
+        type: 'success',
+        data: { 
+          email: email,
+          codeLength: 6,
+          expiresIn: 10 // minutos
+        }
+      };
+
+    } catch (error: any) {
+      this.logger.error(`Error in checkEmail: ${error.message}`, error.stack);
+      return {
+        code: 1,
+        message: 'Error interno del servidor',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+
+  /**
+   * NUEVO FLUJO: Paso 2 - Enviar codigo de Registro
+   */
+
+  async sendRegistrationCode(checkEmailDto: CheckEmailDto): Promise<CustomerAuthResponse> 
+  {
+    try {
+      const { email } = checkEmailDto;
+      this.logger.log(`Sending registration code to: ${email}`);
+
+      // Generar codigos 4 digitos 
+      const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
       // Eliminar códigos anteriores del mismo email
       await this.verificationCodeModel.deleteMany({ 
         email: email.toLowerCase(),
@@ -79,7 +136,7 @@ export class CustomerAuthService {
       
       return {
         code: 0,
-        message: 'Código de verificación enviado a tu email',
+        message: 'Código de verificación enviado.',
         toast: 0,
         redirect_url: '/verify-code',
         type: 'success',
@@ -91,7 +148,7 @@ export class CustomerAuthService {
       };
 
     } catch (error: any) {
-      this.logger.error(`Error in checkEmailAndSendCode: ${error.message}`, error.stack);
+      this.logger.error(`Error in checkEmail: ${error.message}`, error.stack);
       return {
         code: 1,
         message: 'Error interno del servidor',
@@ -104,7 +161,7 @@ export class CustomerAuthService {
   }
 
   /**
-   * NUEVO FLUJO: Paso 2 - Verificar código de registro
+   * NUEVO FLUJO: Paso 3 - Verificar código de registro
    */
   async verifyRegistrationCode(verifyCodeDto: VerifyCodeDto): Promise<CustomerAuthResponse> {
     try {
@@ -167,12 +224,27 @@ export class CustomerAuthService {
   }
 
   /**
-   * NUEVO FLUJO: Paso 3 - Completar registro con contraseña
+   * NUEVO FLUJO: Paso 4 - Completar registro con contraseña
    */
   async completeRegistration(completeDto: CompleteRegistrationDto): Promise<CustomerAuthResponse> {
     try {
       const { email, password, firstName, lastName, phone } = completeDto;
       this.logger.log(`Completing registration for: ${email}`);
+
+      // Mostrar comparación de fechas en consola
+      const fechaLimite = new Date(Date.now() - 30 * 60 * 1000);
+      console.log('🕒 Fecha límite (hace 30 min):', fechaLimite.toISOString());
+      console.log('🕒 Fecha actual:', new Date().toISOString());
+
+      // Consultar todos los registros de verificación para el email
+      const allVerifications = await this.verificationCodeModel.find({
+        email: email.toLowerCase(),
+        type: 'registration'
+      }).sort({ createdAt: -1 });
+      console.log('📋 Todos los registros de verificación para el email:');
+      allVerifications.forEach((reg, idx) => {
+        console.log(`  [${idx}] code: ${reg.code}, isUsed: ${reg.isUsed}, createdAt: ${reg.createdAt}`);
+      });
 
       const recentVerification = await this.verificationCodeModel.findOne({
         email: email.toLowerCase(),
@@ -180,6 +252,11 @@ export class CustomerAuthService {
         isUsed: true,
         createdAt: { $gte: new Date(Date.now() - 30 * 60 * 1000) }
       });
+
+      console.log('🔎 Registro de verificación encontrado:', recentVerification);
+      if (recentVerification) {
+        console.log('📅 Fecha de creación del registro:', recentVerification.createdAt);
+      }
 
       if (!recentVerification) {
         return {

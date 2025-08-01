@@ -1,0 +1,340 @@
+{
+  "language": "es",
+  "id": 10,
+  "show_status": 1,
+  "type_name": "Disney+",
+  "thumb_img": "https://static.gamsgocdn.com/image/dc3267eba3a0779df555d940a2a9eed9.webp",
+  "selectInfo": "Seleccionar tipo",
+  "sku_style_status": false,
+  "plan": {
+    "month": [
+      {
+        "month_id": 18,
+        "month": 6,
+        "month_content": "6 meses",
+        "screen": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 355,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "187.50",
+            "sale_price": "75.00",
+            "average_price": "12.50",
+            "discount": "0.6000"
+          }
+        ]
+      },
+      {
+        "month_id": 24,
+        "month": 12,
+        "month_content": "12 meses",
+        "screen": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 356,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "300.00",
+            "sale_price": "112.50",
+            "average_price": "9.38",
+            "discount": "0.6250"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 86,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 4,
+            "screen_content": "4 perfiles Familia",
+            "seat_type": "Familiar",
+            "type_plan_id": 357,
+            "sort": 5,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "450.00",
+            "sale_price": "281.25",
+            "average_price": "23.44",
+            "discount": "0.3750"
+          }
+        ]
+      }
+    ],
+    "screen": [
+      {
+        "screen_id": 85,
+        "max_user": 4,
+        "substitute_recharge": 0,
+        "screen": 1,
+        "screen_content": "1 perfil",
+        "seat_type": "Personal",
+        "sort": 7,
+        "month": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 355,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "187.50",
+            "sale_price": "75.00",
+            "average_price": "12.50",
+            "discount": "0.6000"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 356,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "300.00",
+            "sale_price": "112.50",
+            "average_price": "9.38",
+            "discount": "0.6250"
+          }
+        ]
+      },
+      {
+        "screen_id": 86,
+        "max_user": 4,
+        "substitute_recharge": 0,
+        "screen": 4,
+        "screen_content": "4 perfiles Familia",
+        "seat_type": "Familiar",
+        "sort": 5,
+        "month": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 86,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 4,
+            "screen_content": "4 perfiles Familia",
+            "seat_type": "Familiar",
+            "type_plan_id": 357,
+            "sort": 5,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "450.00",
+            "sale_price": "281.25",
+            "average_price": "23.44",
+            "discount": "0.3750"
+          }
+        ]
+      }
+    ]
+  },
+  "repayment": {
+    "month": [
+      {
+        "month_id": 18,
+        "month": 6,
+        "month_content": "6 meses",
+        "screen": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 355,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "187.50",
+            "sale_price": "71.25",
+            "average_price": "11.88",
+            "discount": "0.6200"
+          }
+        ]
+      },
+      {
+        "month_id": 24,
+        "month": 12,
+        "month_content": "12 meses",
+        "screen": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 356,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "300.00",
+            "sale_price": "108.75",
+            "average_price": "9.06",
+            "discount": "0.6375"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 86,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 4,
+            "screen_content": "4 perfiles Familia",
+            "seat_type": "Familiar",
+            "type_plan_id": 357,
+            "sort": 5,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "450.00",
+            "sale_price": "270.00",
+            "average_price": "22.50",
+            "discount": "0.4000"
+          }
+        ]
+      }
+    ],
+    "screen": [
+      {
+        "screen_id": 85,
+        "max_user": 4,
+        "substitute_recharge": 0,
+        "screen": 1,
+        "screen_content": "1 perfil",
+        "seat_type": "Personal",
+        "sort": 7,
+        "month": [
+          {
+            "month_id": 18,
+            "month": 6,
+            "month_content": "6 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 355,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "187.50",
+            "sale_price": "71.25",
+            "average_price": "11.88",
+            "discount": "0.6200"
+          },
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 85,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 1,
+            "screen_content": "1 perfil",
+            "seat_type": "Personal",
+            "type_plan_id": 356,
+            "sort": 7,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "300.00",
+            "sale_price": "108.75",
+            "average_price": "9.06",
+            "discount": "0.6375"
+          }
+        ]
+      },
+      {
+        "screen_id": 86,
+        "max_user": 4,
+        "substitute_recharge": 0,
+        "screen": 4,
+        "screen_content": "4 perfiles Familia",
+        "seat_type": "Familiar",
+        "sort": 5,
+        "month": [
+          {
+            "month_id": 24,
+            "month": 12,
+            "month_content": "12 meses",
+            "screen_id": 86,
+            "max_user": 4,
+            "substitute_recharge": 0,
+            "screen": 4,
+            "screen_content": "4 perfiles Familia",
+            "seat_type": "Familiar",
+            "type_plan_id": 357,
+            "sort": 5,
+            "currency_icon1": "S/",
+            "currency_icon2": "PEN(S/)",
+            "currency_show_type": 1,
+            "original_price": "450.00",
+            "sale_price": "270.00",
+            "average_price": "22.50",
+            "discount": "0.4000"
+          }
+        ]
+      }
+    ]
+  },
+  "isActive": true,
+  "metadata": {
+    "category": "Video Streaming",
+    "region": "LATAM",
+    "supportedDevices": ["iOS", "Android", "Web", "Desktop", "Smart TV", "Gaming Consoles"],
+    "totalPlans": 3
+  }
+}

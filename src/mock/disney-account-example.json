@@ -1,0 +1,24 @@
+{
+  "service_id": 10,
+  "service_name": "Disney+",
+  "account_type": "shared",
+  "credentials": {
+    "email": "disney.premium01@example.com",
+    "password": "DisneySecure123!",
+    "profile_name": "Premium Account"
+  },
+  "slot_info": {
+    "max_slots": 4,
+    "used_slots": 0,
+    "assigned_to": []
+  },
+  "plan_type": "12 meses Familia",
+  "subscription_expires_at": "2025-07-27T23:59:59.000Z",
+  "notes": "Cuenta premium Disney+ compartida para hasta 4 usuarios",
+  "metadata": {
+    "country": "PE",
+    "region": "LATAM",
+    "quality": "4K HDR Dolby Vision",
+    "features": ["4K", "HDR", "Dolby Vision", "Dolby Atmos", "Descarga offline", "Múltiples dispositivos"]
+  }
+}
