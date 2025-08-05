@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException, ConflictException } from '@nestj
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Account, AccountDocument, AccountStatus, AccountType } from './schemas/account.schema';
+import { Order, OrderDocument } from '../orders/schemas/order.schema'; // Cambio aquí
 import { CreateAccountDto, UpdateAccountDto, GetAccountsDto, AssignAccountDto } from './dto/account.dto';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class AccountsService {
 
   constructor(
     @InjectModel(Account.name) private accountModel: Model<AccountDocument>,
+    @InjectModel(Order.name) private orderModel: Model<OrderDocument>, // Agregar Order model
   ) {}
 
   /**
@@ -346,13 +348,39 @@ export class AccountsService {
         throw new ConflictException('La cuenta no tiene slots disponibles');
       }
 
-      // Agregar asignación
+      // Buscar la orden para actualizarla
+      const order = await this.orderModel.findOne({ out_trade_no: assignAccountDto.order_id }).exec();
+      if (!order) {
+        throw new NotFoundException('Orden no encontrada');
+      }
+
+      // Agregar asignación a la cuenta
       account.slot_info.used_slots += 1;
       account.slot_info.assigned_to.push(assignAccountDto.order_id);
       
       if (account.slot_info.used_slots >= account.slot_info.max_slots) {
         account.status = AccountStatus.ASSIGNED;
       }
+
+      // Actualizar la orden con información de acceso
+      order.access_info = {
+        account_id: account._id,
+        profile_name: assignAccountDto.profile_name || account.credentials.profile_name,
+        slot_number: account.slot_info.used_slots,
+        access_credentials: {
+          email: account.credentials.email,
+          password: account.credentials.password,
+          profile_pin: assignAccountDto.profile_pin
+        }
+      };
+      
+      order.order_status = 'active' as any; // Cambiar estado a activo
+      
+      // Guardar ambos documentos
+      await Promise.all([
+        account.save(),
+        order.save()
+      ]);
 
       account.updated_at = new Date();
       await account.save();
@@ -365,11 +393,13 @@ export class AccountsService {
         type: 'success',
         data: {
           account_id: account._id,
+          order_id: order._id,
+          order_number: order.out_trade_no,
           email: account.credentials.email,
           password: account.credentials.password,
           profile_name: assignAccountDto.profile_name || account.credentials.profile_name,
           slot_number: account.slot_info.used_slots,
-          expires_at: account.subscription_expires_at
+          expires_at: order.expires_at
         }
       };
 
@@ -415,6 +445,14 @@ export class AccountsService {
         throw new NotFoundException('Orden no encontrada en esta cuenta');
       }
 
+      // Buscar y actualizar la orden
+      const order = await this.orderModel.findOne({ out_trade_no: orderId }).exec();
+      if (order) {
+        order.order_status = 'expired' as any; // Cambiar estado a expirado
+        order.access_info = undefined; // Limpiar información de acceso
+        await order.save();
+      }
+
       // Liberar slot
       account.slot_info.assigned_to.splice(orderIndex, 1);
       account.slot_info.used_slots -= 1;
@@ -434,6 +472,7 @@ export class AccountsService {
         type: 'success',
         data: {
           account_id: account._id,
+          order_id: order?._id,
           available_slots: account.slot_info.max_slots - account.slot_info.used_slots
         }
       };

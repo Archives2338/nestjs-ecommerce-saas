@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { ServicesService } from '../services/services.service';
+import { CurrencyConverter } from '../utils/currency-converter';
 
 /**
  * Script de seed para servicios de streaming
@@ -8,6 +9,8 @@ import { ServicesService } from '../services/services.service';
  * NOTA: Esta implementación usa estructura embebida para planes.
  * Ver ROADMAP.md - Fase 2 para migración hacia arquitectura dinámica
  * con month_id y screen_id independientes.
+ * 
+ * ACTUALIZADO: Precios convertidos a PEN (Soles peruanos)
  */
 
 async function seedServices() {

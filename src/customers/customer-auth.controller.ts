@@ -24,7 +24,8 @@ import {
   FacebookOAuthDto,
   CheckEmailDto,
   VerifyCodeDto,
-  CompleteRegistrationDto
+  CompleteRegistrationDto,
+  OrderHistoryDto
 } from './dto/customer-auth.dto';
 
 @Controller('api/customer/auth')
@@ -320,5 +321,35 @@ export class CustomerAuthController {
       type: 'error',
       data: null
     };
+  }
+
+  /**
+   * Historial de pedidos del cliente
+   * POST /api/customer/auth/order-history
+   */
+  @Post('order-history')
+  @HttpCode(HttpStatus.OK)
+  // @UseGuards(CustomerAuthGuard) // TODO: Implementar guard cuando esté listo
+  async getOrderHistory(@Body(ValidationPipe) historyDto: OrderHistoryDto, @Req() req: any) {
+    // TODO: Extraer customer ID del JWT token
+    const customerId = req.user?.id || req.headers['customer-id']; // Temporal mientras no hay JWT
+    
+    if (!customerId) {
+      return {
+        code: 1,
+        message: 'No autorizado',
+        toast: 1,
+        redirect_url: '/login',
+        type: 'error',
+        data: null
+      };
+    }
+
+    this.logger.log(`Order history request for customer: ${customerId}`);
+    
+    const result = await this.customerAuthService.getOrderHistory(customerId, historyDto);
+    
+    this.logger.log(`Order history result: ${result.code === 0 ? 'SUCCESS' : 'FAILED'}`);
+    return result;
   }
 }

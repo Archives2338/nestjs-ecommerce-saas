@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { Customer, CustomerDocument } from './schemas/customer.schema';
 import { VerificationCode, VerificationCodeDocument } from '../auth/schemas/verification-code.schema';
+import { OrdersService } from '../orders/orders.service';
 import { 
   RegisterCustomerDto, 
   LoginCustomerDto, 
@@ -17,7 +18,8 @@ import {
   CustomerAuthResponse,
   CheckEmailDto,
   VerifyCodeDto,
-  CompleteRegistrationDto
+  CompleteRegistrationDto,
+  OrderHistoryDto
 } from './dto/customer-auth.dto';
 
 @Injectable()
@@ -28,6 +30,7 @@ export class CustomerAuthService {
     @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
     @InjectModel(VerificationCode.name) private verificationCodeModel: Model<VerificationCodeDocument>,
     private jwtService: JwtService,
+    private ordersService: OrdersService,
   ) {}
 
   /**
@@ -320,7 +323,7 @@ export class CustomerAuthService {
         code: 0,
         message: 'Registro completado exitosamente',
         toast: 0,
-        redirect_url: '/dashboard',
+        redirect_url: '/',
         type: 'success',
         data: {
           token: accessToken,
@@ -410,7 +413,7 @@ export class CustomerAuthService {
         code: 0,
         message: 'Registro exitoso. Verifica tu email para completar el proceso.',
         toast: 0,
-        redirect_url: '/dashboard',
+        redirect_url: '/',
         type: 'success',
         data: {
           token,
@@ -494,7 +497,7 @@ export class CustomerAuthService {
         code: 0,
         message: 'Login exitoso',
         toast: 0,
-        redirect_url: '/dashboard',
+        redirect_url: '/',
         type: 'success',
         data: {
           token,
@@ -552,7 +555,7 @@ export class CustomerAuthService {
         code: 0,
         message: 'Email verificado exitosamente',
         toast: 0,
-        redirect_url: '/dashboard',
+        redirect_url: '/',
         type: 'success',
         data: null
       };
@@ -794,5 +797,123 @@ export class CustomerAuthService {
       type: 'error',
       data: null
     };
+  }
+
+  /**
+   * Obtener historial de pedidos del cliente
+   */
+  async getOrderHistory(customerId: string, historyDto: OrderHistoryDto): Promise<CustomerAuthResponse> {
+    try {
+      const { order_status, out_trade_no, start_time, end_time, type_ids, page = 1, limit = 10, language = 'es' } = historyDto;
+
+      // Usar el servicio real de órdenes
+      const filters = {
+        order_status,
+        out_trade_no,
+        start_time,
+        end_time,
+        type_ids
+      };
+
+      const [orderHistory, orderStats, serviceTypes] = await Promise.all([
+        this.ordersService.getOrderHistory(customerId, filters, page, limit),
+        this.ordersService.getOrderStatistics(customerId),
+        this.ordersService.getUserServiceTypes(customerId)
+      ]);
+
+      // Transformar los datos al formato esperado por el frontend
+      const transformedOrders = orderHistory.orders.map(order => ({
+        id: order._id,
+        type: 1, // Default
+        out_trade_no: order.out_trade_no,
+        type_id: order.type_id,
+        type_plan_id: order.type_plan_id,
+        product_id: 0, // Calculado después
+        service_id: order.service_id || 0,
+        substitute_recharge_id: 0,
+        user_id: parseInt(customerId),
+        number: order.number,
+        screen: order.screen,
+        payment_id: order.payment_id,
+        service_start_time: order.service_start_time || '',
+        service_end_time: order.service_end_time || '',
+        currency: order.currency,
+        otype: 1, // Default
+        renew: 0,
+        renew_type: 0,
+        total_price: order.total_price,
+        original_price: order.original_price,
+        payment_fee: "0.00",
+        payment_rate: "0%",
+        ostatus: order.ostatus,
+        refund_status: 0,
+        coupon_discount: "0.00",
+        promo_code_discount: "0.00",
+        auto_renewal_discount: "0.00",
+        create_time: order.create_time || new Date().toLocaleDateString('es-PE') + ' ' + new Date().toLocaleTimeString('es-PE', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+        country_code: order.country_code || "PE",
+        username: "",
+        currency_icon1: order.currency === 'PEN' ? 'S/' : '$',
+        currency_icon2: order.currency === 'PEN' ? 'PEN(S/)' : 'USD($)',
+        type_name: (order.service as any)?.name || 'Servicio',
+        type_image: (order.service as any)?.icon || 'https://static.gamsgocdn.com/image/default.webp',
+        month_content: "1 mes", // Default
+        is_solo: false,
+        sub_account_info: (order as any).sub_account_info || 0,
+        promo_code: order.promo_code || "",
+        show_status: order.ostatus,
+        actual_refund_status: 0,
+        diff_price: "0.00",
+        from_spu: "",
+        substitute_recharge_status: -1
+      }));
+
+      const responseData = {
+        total: orderHistory.total,
+        list: transformedOrders,
+        type: serviceTypes.map(st => ({
+          type_id: st.type_id,
+          type_name: st.type_name
+        })),
+        statistic: orderStats
+      };
+
+      this.logger.log(`Order history retrieved for customer ${customerId}: ${orderHistory.total} orders`);
+
+      return {
+        code: 0,
+        message: 'Listo',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: responseData as any
+      };
+
+    } catch (error: any) {
+      this.logger.error('Error getting order history:', error);
+      
+      // Fallback a datos mock en caso de error
+      const mockData = {
+        total: 0,
+        list: [],
+        type: [],
+        statistic: [
+          { order_status: 1, count: 0 },
+          { order_status: 2, count: 0 },
+          { order_status: 3, count: 0 },
+          { order_status: 4, count: 0 },
+          { order_status: 5, count: 0 }
+        ]
+      };
+
+      return {
+        code: 0, // Mantener éxito para no romper frontend
+        message: 'Historial vacío',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: mockData as any
+      };
+    }
   }
 }

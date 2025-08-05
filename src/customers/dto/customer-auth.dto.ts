@@ -9,7 +9,11 @@ import {
   IsNotEmpty,
   Matches,
   IsPhoneNumber,
-  Length
+  Length,
+  IsArray,
+  IsNumber,
+  Min,
+  Max
 } from 'class-validator';
 
 // DTO para el paso 1: Solo email
@@ -196,4 +200,42 @@ export class CustomerAuthResponse {
     expiresIn?: number;
     verified?: boolean;
   } | null;
+}
+
+// DTO para historial de pedidos
+export class OrderHistoryDto {
+  @IsOptional()
+  @IsString()
+  order_status?: string;
+
+  @IsOptional()
+  @IsString()
+  out_trade_no?: string;
+
+  @IsOptional()
+  @IsString()
+  start_time?: string;
+
+  @IsOptional()
+  @IsString()
+  end_time?: string;
+
+  @IsOptional()
+  @IsArray()
+  type_ids?: number[];
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  page?: number = 1;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  limit?: number = 10;
+
+  @IsOptional()
+  @IsString()
+  language?: string = 'es';
 }

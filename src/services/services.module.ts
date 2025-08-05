@@ -6,14 +6,14 @@ import { ServicesService } from './services.service';
 // import { AccountsService } from '../accounts/accounts.service';
 import { Service, ServiceSchema } from './schemas/service.schema';
 import { Account, AccountSchema } from './schemas/account.schema';
-import { UserOrder, UserOrderSchema } from './schemas/user-order.schema';
+import { Order, OrderSchema } from '../orders/schemas/order.schema'; // Cambio aquí
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Service.name, schema: ServiceSchema },
       { name: Account.name, schema: AccountSchema },
-      { name: UserOrder.name, schema: UserOrderSchema }
+      { name: Order.name, schema: OrderSchema } // Cambio aquí
     ])
   ],
   controllers: [ServicesController],

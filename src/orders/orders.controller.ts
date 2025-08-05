@@ -1,8 +1,18 @@
-import { Controller, Post, Get, Put, Body, Param, Req, UploadedFile, UseInterceptors, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Post, Get, Put, Body, Param, Req, UploadedFile, UseInterceptors, HttpStatus, HttpCode, Query, UseGuards, ForbiddenException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OcrService } from './ocr.service';
 import { OrdersService } from './orders.service';
 import { Order } from './schemas/order.schema';
+import { CreateOrderDto, UpdateOrderStatusDto, AttachComprobanteDto } from './dto/create-order.dto';
+import { CustomerJwtAuthGuard } from './customer-jwt-auth.guard';
+import { CurrentUser, UserId } from '../common/decorators/user.decorator';
+
+interface MulterFile {
+  buffer?: Buffer;
+  originalname: string;
+  mimetype: string;
+  size: number;
+}
 
 @Controller('api/orders')
 export class OrdersController {
@@ -10,6 +20,7 @@ export class OrdersController {
     private readonly ordersService: OrdersService,
     private readonly ocrService: OcrService
   ) {}
+
   /**
    * API de prueba para cargar imagen y extraer texto OCR
    * POST /api/orders/test-ocr
@@ -29,65 +40,182 @@ export class OrdersController {
     };
   }
 
+  // ================================
+  // ENDPOINTS CON AUTENTICACIÓN JWT
+  // ================================
+
   /**
-   * Crear nueva orden
+   * Crear nueva orden - REQUIERE AUTENTICACIÓN
    * POST /api/orders
    */
   @Post()
+  @UseGuards(CustomerJwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async createOrder(@Body() data: Partial<Order>, @Req() req: any) {
-    // TODO: extraer customerId del JWT en producción
-    const customerId = req.user?.id || data.customer;
-    const order = await this.ordersService.createOrder({ ...data, customer: customerId });
+  async createOrder(
+    @Body() createOrderDto: CreateOrderDto, 
+    @UserId() userId: string,
+    @CurrentUser() user: any
+  ) {
+    console.log('� DEBUG - Raw user object:', JSON.stringify(user, null, 2));
+    console.log('🔍 DEBUG - Extracted userId:', userId);
+    console.log('�🚀 Creating order for user:', userId, 'with data:', createOrderDto);
+    // Verificar que el usuario está autenticado
+    if (!userId) {
+      console.log('❌ DEBUG - No userId found!');
+      return {
+        code: 1,
+        message: 'Usuario no autenticado',
+        data: null
+      };
+    }
+
+    const order = await this.ordersService.createOrder(createOrderDto, userId);
     return {
       code: 0,
-      message: 'Orden creada',
+      message: 'Orden creada exitosamente',
       data: order
     };
   }
 
   /**
-   * Adjuntar comprobante de pago (URL y texto OCR)
+   * Adjuntar comprobante de pago con archivo - REQUIERE AUTENTICACIÓN
    * PUT /api/orders/:id/comprobante
    */
   @Put(':id/comprobante')
+  @UseGuards(CustomerJwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
   @HttpCode(HttpStatus.OK)
-  async attachComprobante(@Param('id') orderId: string, @Body() body: { comprobanteUrl: string, comprobanteOcrText?: string }) {
-    // Si se provee comprobanteOcrText, lo pasa como texto; si no, solo adjunta la URL
-    let imageBuffer: Buffer | undefined = undefined;
-    if (body.comprobanteOcrText && Buffer.isBuffer(body.comprobanteOcrText)) {
-      imageBuffer = body.comprobanteOcrText as unknown as Buffer;
+  async attachComprobante(
+    @Param('id') orderId: string, 
+    @UploadedFile() file: MulterFile,
+    @Body() attachDto: AttachComprobanteDto,
+    @UserId() userId: string
+  ) {
+    // Verificar que la orden pertenece al usuario autenticado
+    const existingOrder = await this.ordersService.findOrderById(orderId);
+    if (!existingOrder || existingOrder.customer.toString() !== userId) {
+      return {
+        code: 1,
+        message: 'Orden no encontrada o no autorizada',
+        data: null
+      };
     }
-    const order = await this.ordersService.attachComprobante(orderId, body.comprobanteUrl, imageBuffer);
+
+    const order = await this.ordersService.attachComprobante(orderId, file, attachDto);
     return {
       code: order ? 0 : 1,
-      message: order ? 'Comprobante adjuntado' : 'Orden no encontrada',
+      message: order ? 'Comprobante adjuntado exitosamente' : 'Error al adjuntar comprobante',
       data: order
     };
   }
 
   /**
-   * Actualizar estado de la orden
+   * Obtener orden por ID - REQUIERE AUTENTICACIÓN
+   * GET /api/orders/:id
+   */
+  @Get(':id')
+  @UseGuards(CustomerJwtAuthGuard)
+  async getOrder(@Param('id') orderId: string, @UserId() userId: string) {
+    const order = await this.ordersService.findOrderById(orderId);
+    
+    // Verificar que la orden pertenece al usuario autenticado
+    if (!order || order.customer.toString() !== userId) {
+      return {
+        code: 1,
+        message: 'Orden no encontrada o no autorizada',
+        data: null
+      };
+    }
+
+    return {
+      code: 0,
+      message: 'Orden encontrada',
+      data: order
+    };
+  }
+
+  /**
+   * Obtener historial de órdenes del usuario autenticado
+   * GET /api/orders/my/history
+   */
+  @Get('my/history')
+  @UseGuards(CustomerJwtAuthGuard)
+  async getMyOrderHistory(
+    @UserId() userId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('order_status') order_status?: number,
+    @Query('out_trade_no') out_trade_no?: string,
+    @Query('type_ids') type_ids?: string,
+    @Query('start_time') start_time?: string,
+    @Query('end_time') end_time?: string
+  ) {
+    const filters = {
+      order_status,
+      out_trade_no,
+      type_ids: type_ids ? type_ids.split(',').map(Number) : undefined,
+      start_time,
+      end_time
+    };
+
+    const result = await this.ordersService.getOrderHistory(userId, filters, page, limit);
+    
+    return {
+      code: 0,
+      message: 'Historial obtenido exitosamente',
+      data: {
+        orders: result.orders,
+        pagination: {
+          current_page: page,
+          per_page: limit,
+          total: result.total,
+          total_pages: Math.ceil(result.total / limit)
+        }
+      }
+    };
+  }
+
+  /**
+   * Obtener estadísticas de órdenes del usuario autenticado
+   * GET /api/orders/my/statistics
+   */
+  @Get('my/statistics')
+  @UseGuards(CustomerJwtAuthGuard)
+  async getMyOrderStatistics(@UserId() userId: string) {
+    const stats = await this.ordersService.getOrderStatistics(userId);
+    return {
+      code: 0,
+      message: 'Estadísticas obtenidas exitosamente',
+      data: stats
+    };
+  }
+
+  // ================================
+  // ENDPOINTS ADMINISTRATIVOS
+  // ================================
+
+  /**
+   * [ADMIN] Actualizar estado de la orden
    * PUT /api/orders/:id/status
    */
   @Put(':id/status')
   @HttpCode(HttpStatus.OK)
-  async updateOrderStatus(@Param('id') orderId: string, @Body() body: { status: string }) {
-    const order = await this.ordersService.updateOrderStatus(orderId, body.status);
+  async updateOrderStatus(@Param('id') orderId: string, @Body() updateDto: UpdateOrderStatusDto) {
+    const order = await this.ordersService.updateOrderStatus(orderId, updateDto);
     return {
       code: order ? 0 : 1,
-      message: order ? 'Estado actualizado' : 'Orden no encontrada',
+      message: order ? 'Estado actualizado exitosamente' : 'Orden no encontrada',
       data: order
     };
   }
 
   /**
-   * Obtener orden por ID
-   * GET /api/orders/:id
+   * [ADMIN] Buscar orden por número de orden
+   * GET /api/orders/trade-no/:tradeNo
    */
-  @Get(':id')
-  async getOrder(@Param('id') orderId: string) {
-    const order = await this.ordersService.findOrderById(orderId);
+  @Get('trade-no/:tradeNo')
+  async getOrderByTradeNo(@Param('tradeNo') tradeNo: string) {
+    const order = await this.ordersService.findOrderByTradeNo(tradeNo);
     return {
       code: order ? 0 : 1,
       message: order ? 'Orden encontrada' : 'Orden no encontrada',
@@ -96,16 +224,70 @@ export class OrdersController {
   }
 
   /**
-   * Listar órdenes de un cliente
+   * [ADMIN] Obtener historial de órdenes de un cliente específico
+   * GET /api/orders/customer/:customerId/history
+   */
+  @Get('customer/:customerId/history')
+  async getOrderHistory(
+    @Param('customerId') customerId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('order_status') order_status?: number,
+    @Query('out_trade_no') out_trade_no?: string,
+    @Query('type_ids') type_ids?: string,
+    @Query('start_time') start_time?: string,
+    @Query('end_time') end_time?: string
+  ) {
+    const filters = {
+      order_status,
+      out_trade_no,
+      type_ids: type_ids ? type_ids.split(',').map(Number) : undefined,
+      start_time,
+      end_time
+    };
+
+    const result = await this.ordersService.getOrderHistory(customerId, filters, page, limit);
+    
+    return {
+      code: 0,
+      message: 'Historial obtenido exitosamente',
+      data: {
+        orders: result.orders,
+        pagination: {
+          current_page: page,
+          per_page: limit,
+          total: result.total,
+          total_pages: Math.ceil(result.total / limit)
+        }
+      }
+    };
+  }
+
+  /**
+   * [ADMIN] Obtener tipos de servicios del usuario
+   * GET /api/orders/customer/:customerId/service-types
+   */
+  @Get('customer/:customerId/service-types')
+  async getUserServiceTypes(@Param('customerId') customerId: string) {
+    const serviceTypes = await this.ordersService.getUserServiceTypes(customerId);
+    return {
+      code: 0,
+      message: 'Tipos de servicios obtenidos exitosamente',
+      data: serviceTypes
+    };
+  }
+
+  /**
+   * [ADMIN] Listar todas las órdenes de un cliente (método simple para compatibilidad)
    * GET /api/orders/customer/:customerId
    */
   @Get('customer/:customerId')
   async listOrdersByCustomer(@Param('customerId') customerId: string) {
-    const orders = await this.ordersService.listOrdersByCustomer(customerId);
+    const result = await this.ordersService.getOrderHistory(customerId, {}, 1, 50);
     return {
       code: 0,
       message: 'Órdenes encontradas',
-      data: orders
+      data: result.orders
     };
   }
 }

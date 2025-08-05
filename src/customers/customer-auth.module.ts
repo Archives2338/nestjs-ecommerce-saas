@@ -1,15 +1,21 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomerAuthController } from './customer-auth.controller';
 import { CustomerAuthService } from './customer-auth.service';
 import { Customer, CustomerSchema } from './schemas/customer.schema';
 import { VerificationCode, VerificationCodeSchema } from '../auth/schemas/verification-code.schema';
 import { EmailModule } from '../email/email.module';
+import { OrdersModule } from '../orders/orders.module';
+import { CustomerJwtStrategy } from '../orders/customer-jwt.strategy';
 
 @Module({
   imports: [
+    // Passport para strategies
+    PassportModule,
+    
     // Schema de clientes y códigos de verificación
     MongooseModule.forFeature([
       { name: Customer.name, schema: CustomerSchema },
@@ -30,9 +36,18 @@ import { EmailModule } from '../email/email.module';
 
     // Módulo de email para verificaciones
     EmailModule,
+    
+    // Módulo de órdenes para historial
+    forwardRef(() => OrdersModule),
   ],
   controllers: [CustomerAuthController],
-  providers: [CustomerAuthService],
-  exports: [CustomerAuthService], // Exportar para usar en otros módulos
+  providers: [
+    CustomerAuthService,
+    CustomerJwtStrategy, // Registrar la strategy como provider
+  ],
+  exports: [
+    CustomerAuthService,
+    CustomerJwtStrategy, // Exportar la strategy para otros módulos
+  ],
 })
 export class CustomerAuthModule {}
