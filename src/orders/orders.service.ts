@@ -1,28 +1,4 @@
-import { Injectable, Logge  async createOrder(createOrderDto: CreateOrderDto, customerId: string): Promise<Order> {
-    try {
-      console.log('🚀 Creating order with data:', createOrderDto, 'for customer:', customerId);
-      
-      // Validar que customerId sea un ObjectId válido
-      console.log('🔍 Validating customerId:', customerId, 'isValid:', Types.ObjectId.isValid(customerId));
-      if (!Types.ObjectId.isValid(customerId)) {
-        throw new Error(`Invalid customerId: ${customerId}. Must be a valid ObjectId.`);
-      }
-      
-      // Validar que serviceId sea un ObjectId válido  
-      console.log('🔍 Validating serviceId:', createOrderDto.serviceId, 'isValid:', Types.ObjectId.isValid(createOrderDto.serviceId));
-      if (!Types.ObjectId.isValid(createOrderDto.serviceId)) {
-        throw new Error(`Invalid serviceId: ${createOrderDto.serviceId}. Must be a valid ObjectId.`);
-      }
-      
-      // Generar número único de orden
-      const out_trade_no = this.generateOrderNumber();
-      console.log('🔢 Generated order number:', out_trade_no);
-      // Obtener información del servicio y plan (simplificado por ahora)
-      const serviceInfo = await this.getServiceInfo(createOrderDto.serviceId, createOrderDto.type_plan_id);
-      console.log('🔍 Service info:', serviceInfo);
-      const orderData = { 
-        // Campos básicos
-        customer: new Types.ObjectId(customerId),xception } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { OcrService } from './ocr.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
