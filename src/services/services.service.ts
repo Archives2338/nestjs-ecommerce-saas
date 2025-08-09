@@ -41,6 +41,7 @@ export class ServicesService {
         type: 'success',
         data: {
           id: service.type_id,
+          _id: service._id.toString(), // ✅ Agregar ObjectId para createOrder
           show_status: service.active ? 5 : 0, // Coincide con el ejemplo (5)
           type_name: service.name,
           thumb_img: service.icon,

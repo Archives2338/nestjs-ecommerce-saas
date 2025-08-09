@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación de correo electrónico - MetelePlay</title>
+  <style>
+    .wrapper {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 8px;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 16px;
+    }
+    .code {
+      background: #f0f0f0;
+      color: #333;
+      font-size: 32px;
+      font-weight: bold;
+      padding: 20px;
+      border-radius: 8px;
+      letter-spacing: 4px;
+      display: inline-block;
+      margin: 20px 0;
+    }
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+    .copyright {
+      font-size: 10px;
+      text-align: center;
+      color: #adafae;
+      margin-top: 40px;
+    }
+    .security-notice {
+      color: #595959;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .btn-verify {
+      background: #28a745;
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 5px;
+      display: inline-block;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <section class="container">
+      
+      <!-- Logo MetelePlay -->
+      <div style="margin-bottom:40px">
+        <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" 
+             width="150px" 
+             height="25px" 
+             alt="MetelePlay" />
+      </div>
+      
+      <!-- Contenido principal -->
+      <p class="title">{{userName}}, ¡Hola!</p>
+      
+      <p>Está verificando su correo electrónico en MetelePlay, el código de verificación es:</p>
+      
+      <p style="text-align:center">
+        <span class="code">{{verificationCode}}</span>
+      </p>
+      
+      <p>y será válido durante {{expiresIn}}.</p>
+      
+
+      
+      <p class="security-notice">
+        Para la seguridad de su cuenta, no comparta el código de verificación con otros e ignore este correo si no lo está haciendo usted mismo.
+      </p>
+      
+      <!-- Footer -->
+      <footer class="footer">
+        <p style="margin-bottom:16px">
+          🌹 Mis mejores deseos,<br>
+          Equipo MetelePlay
+        </p>
+        
+        <div style="margin-bottom:40px">
+          <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" 
+               width="104px" 
+               height="17px" 
+               alt="MetelePlay" />
+        </div>
+      </footer>
+      
+    </section>
+    
+    <!-- Copyright -->
+    <div class="copyright">
+      Copyright © 2020-{{currentYear}} METELEPLAY Ltd.- All Rights Reserved
+    </div>
+    
+  </div>
+</body>
+</html>

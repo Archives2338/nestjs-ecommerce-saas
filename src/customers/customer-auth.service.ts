@@ -7,6 +7,7 @@ import * as crypto from 'crypto';
 import { Customer, CustomerDocument } from './schemas/customer.schema';
 import { VerificationCode, VerificationCodeDocument } from '../auth/schemas/verification-code.schema';
 import { OrdersService } from '../orders/orders.service';
+import { GamsGoEmailService } from '../email/email.service.example';
 import { 
   RegisterCustomerDto, 
   LoginCustomerDto, 
@@ -31,6 +32,7 @@ export class CustomerAuthService {
     @InjectModel(VerificationCode.name) private verificationCodeModel: Model<VerificationCodeDocument>,
     private jwtService: JwtService,
     private ordersService: OrdersService,
+    private emailService: GamsGoEmailService,
   ) {}
 
   /**
@@ -134,18 +136,38 @@ export class CustomerAuthService {
 
       await newCode.save();
 
-      // TODO: Enviar email con el código
+      // 📧 Enviar email con el código usando template GamsGo
+      try {
+        const emailData = {
+          userName: email.split('@')[0], // Usar parte del email como nombre temporal
+          verificationCode: verificationCode,
+          verificationUrl: `${process.env.FRONTEND_URL || 'https://gamsgo.com'}/verify-code?email=${encodeURIComponent(email)}&code=${verificationCode}`,
+          expiresIn: '10 minutos'
+        };
+
+        const emailSent = await this.emailService.sendVerificationCodeWithMailer(email, emailData);
+        
+        if (emailSent) {
+          this.logger.log(`✅ Verification email sent successfully to ${email}`);
+        } else {
+          this.logger.warn(`⚠️ Failed to send verification email to ${email}, but code is still valid`);
+        }
+      } catch (emailError) {
+        this.logger.error(`❌ Error sending verification email to ${email}:`, emailError);
+        // No fallar la operación si el email falla, el código sigue siendo válido
+      }
+
       this.logger.log(`Verification code generated for ${email}: ${verificationCode}`);
       
       return {
         code: 0,
-        message: 'Código de verificación enviado.',
+        message: 'Código de verificación enviado a tu email.',
         toast: 0,
         redirect_url: '/verify-code',
         type: 'success',
         data: { 
           email: email,
-          codeLength: 6,
+          codeLength: 4, // Cambiado a 4 dígitos según tu implementación
           expiresIn: 10 // minutos
         }
       };
@@ -318,6 +340,29 @@ export class CustomerAuthService {
         email: email.toLowerCase(),
         type: 'registration'
       });
+
+      // 🎉 Enviar email de bienvenida
+      try {
+        const welcomeEmailData = {
+          userName: `${firstName} ${lastName}`,
+          serviceName: 'GamsGo Premium',
+          planName: 'Cuenta Verificada'
+        };
+        
+        const welcomeEmailSent = await this.emailService.sendWelcomeEmail(
+          email, 
+          welcomeEmailData
+        );
+        
+        if (welcomeEmailSent) {
+          this.logger.log(`✅ Welcome email sent successfully to ${email}`);
+        } else {
+          this.logger.warn(`⚠️ Failed to send welcome email to ${email}`);
+        }
+      } catch (emailError) {
+        this.logger.error(`❌ Error sending welcome email to ${email}:`, emailError);
+        // No fallar la operación si el email de bienvenida falla
+      }
 
       return {
         code: 0,
@@ -601,7 +646,24 @@ export class CustomerAuthService {
       customer.passwordResetExpires = new Date(Date.now() + 3600000); // 1 hora
       await customer.save();
 
-      // TODO: Enviar email con instrucciones de reset
+      // Enviar email con instrucciones de reset
+      try {
+        const emailSent = await this.emailService.sendPasswordRecoveryCode(
+          customer.email,
+          resetToken,
+          customer.firstName || customer.email.split('@')[0]
+        );
+
+        if (emailSent) {
+          this.logger.log(`✅ Password reset email sent successfully to: ${customer.email}`);
+        } else {
+          this.logger.warn(`⚠️ Failed to send password reset email to: ${customer.email}`);
+        }
+      } catch (emailError) {
+        this.logger.error(`❌ Error sending password reset email to ${customer.email}:`, emailError);
+        // No fallar el proceso completo si el email falla, pero logear el error
+      }
+
       this.logger.log(`Password reset requested for: ${customer.email}`);
 
       return {

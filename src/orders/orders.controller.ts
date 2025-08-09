@@ -91,6 +91,10 @@ export class OrdersController {
     @Body() attachDto: AttachComprobanteDto,
     @UserId() userId: string
   ) {
+    console.log('🔍 DEBUG - Raw body data:', JSON.stringify(attachDto, null, 2));
+    console.log('🔍 DEBUG - paymentAmount type:', typeof attachDto.paymentAmount, 'value:', attachDto.paymentAmount);
+    console.log('🔍 Attaching comprobante to order:', orderId, 'with file:', file?.originalname);
+    
     // Verificar que la orden pertenece al usuario autenticado
     const existingOrder = await this.ordersService.findOrderById(orderId);
     if (!existingOrder || existingOrder.customer.toString() !== userId) {

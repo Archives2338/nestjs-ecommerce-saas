@@ -6,13 +6,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { Order, OrderSchema } from './schemas/order.schema';
+import { Service, ServiceSchema } from '../services/schemas/service.schema';
 import { OcrService } from './ocr.service';
 import { CustomerJwtStrategy } from './customer-jwt.strategy';
 import { CustomerAuthModule } from '../customers/customer-auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+    MongooseModule.forFeature([
+      { name: Order.name, schema: OrderSchema },
+      { name: Service.name, schema: ServiceSchema }
+    ]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

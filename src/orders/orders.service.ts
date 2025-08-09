@@ -2,7 +2,8 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { OcrService } from './ocr.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Order, OrderDocument } from './schemas/order.schema';
+import { Order, OrderDocument, OrderStatus } from './schemas/order.schema';
+import { Service, ServiceDocument } from '../services/schemas/service.schema';
 import { CreateOrderDto, UpdateOrderStatusDto, AttachComprobanteDto } from './dto/create-order.dto';
 
 interface MulterFile {
@@ -18,6 +19,7 @@ export class OrdersService {
 
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
     private readonly ocrService: OcrService
   ) {}
 
@@ -36,6 +38,7 @@ export class OrdersService {
       const orderData = { 
         // Campos básicos
         customer: new Types.ObjectId(customerId),
+        user_id: customerId, // ✅ Agregar user_id obligatorio
         items: createOrderDto.items,
         total: createOrderDto.total,
         
@@ -48,9 +51,18 @@ export class OrdersService {
         screen: createOrderDto.items[0]?.profiles || 1,
         payment_id: this.getPaymentMethodId(createOrderDto.paymentMethod),
         
+        // ✅ Campos obligatorios que faltaban
+        service_name: serviceInfo.service_name || 'Unknown Service',
+        plan_name: `${createOrderDto.items[0]?.name || serviceInfo.plan_details?.screen_content || 'Plan 1 mes'}`,
+        duration_months: serviceInfo.plan_details?.month || 1,
+        max_users: serviceInfo.plan_details?.max_user || createOrderDto.items[0]?.profiles || 1,
+        order_status: OrderStatus.PENDING, // Estado inicial
+        starts_at: new Date(), // Fecha de inicio
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 días
+        
         // Precios
         total_price: createOrderDto.total.toString(),
-        original_price: serviceInfo.original_price,
+        original_price: serviceInfo.original_price || '0.00',
         currency: 'PEN',
         
         // Estados iniciales
@@ -118,6 +130,7 @@ export class OrdersService {
    */
   async attachComprobante(orderId: string, file: MulterFile, attachDto: AttachComprobanteDto): Promise<Order | null> {
     try {
+      console.log('🔍 Attaching comprobante to order:', orderId, 'with file:', file.originalname);
       let ocrText: string | undefined = undefined;
       
       if (file?.buffer) {
@@ -298,12 +311,76 @@ export class OrdersService {
   }
 
   private async getServiceInfo(serviceId: string, typePlanId: number): Promise<any> {
-    // TODO: Integrar con ServicesService para obtener info real
-    // Por ahora retorno datos mock
-    return {
-      type_id: 1, // Netflix por defecto
-      original_price: '21.99'
-    };
+    try {
+      // Consultar el servicio por ID
+      const service = await this.serviceModel.findById(serviceId).exec();
+      
+      if (!service) {
+        this.logger.warn(`Service not found with ID: ${serviceId}, using defaults`);
+        return {
+          type_id: 1, // Netflix por defecto
+          original_price: '21.99',
+          service_name: 'Unknown Service'
+        };
+      }
+
+      // Buscar el plan específico en la estructura de pantallas
+      let planInfo = null;
+      
+      // Buscar en plan.month[].screen[]
+      if (service.plan && service.plan.month) {
+        for (const monthPlan of service.plan.month) {
+          if (monthPlan.screen) {
+            planInfo = monthPlan.screen.find(screen => screen.type_plan_id === typePlanId);
+            if (planInfo) break;
+          }
+        }
+      }
+
+      // Si no se encuentra en month, buscar en plan.screen[].month[]
+      if (!planInfo && service.plan && service.plan.screen) {
+        for (const screenPlan of service.plan.screen) {
+          if (screenPlan.month) {
+            planInfo = screenPlan.month.find(month => month.type_plan_id === typePlanId);
+            if (planInfo) break;
+          }
+        }
+      }
+
+      if (!planInfo) {
+        this.logger.warn(`Plan not found with type_plan_id: ${typePlanId} in service: ${serviceId}`);
+        return {
+          type_id: service.type_id || 1,
+          original_price: '21.99',
+          service_name: service.name || 'Unknown Service'
+        };
+      }
+
+      // Retornar información completa del servicio y plan
+      return {
+        type_id: service.type_id,
+        service_name: service.name,
+        original_price: planInfo.original_price || planInfo.sale_price || '0.00',
+        sale_price: planInfo.sale_price || planInfo.original_price || '0.00',
+        plan_details: {
+          type_plan_id: planInfo.type_plan_id,
+          month: planInfo.month,
+          month_content: planInfo.month_content,
+          screen: planInfo.screen,
+          screen_content: planInfo.screen_content,
+          max_user: planInfo.max_user,
+          seat_type: planInfo.seat_type
+        }
+      };
+      
+    } catch (error) {
+      this.logger.error('Error getting service info:', error);
+      return {
+        type_id: 1,
+        original_price: '21.99',
+        service_name: 'Error Service'
+      };
+    }
   }
 
   private calculateServiceEndDate(days: number): string {

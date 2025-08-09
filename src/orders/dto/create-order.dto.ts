@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsArray, ValidateNested, IsNotEmpty, IsEnum } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export class CreateOrderItemDto {
   @IsString()
@@ -74,5 +74,13 @@ export class AttachComprobanteDto {
 
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => {
+    // Convertir string a número si es necesario
+    if (typeof value === 'string') {
+      const num = parseFloat(value);
+      return isNaN(num) ? value : num;
+    }
+    return value;
+  })
   paymentAmount?: number;
 }

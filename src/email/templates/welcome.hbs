@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenido a MetelePlay</title>
+  <style>
+    .wrapper {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 8px;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 16px;
+    }
+    .features-box {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .btn-primary {
+      background: #007bff;
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 5px;
+      display: inline-block;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+    .copyright {
+      font-size: 10px;
+      text-align: center;
+      color: #adafae;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <section class="container">
+      
+      <!-- Logo MetelePlay -->
+      <div style="margin-bottom:40px">
+        <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" 
+             width="150px" 
+             height="25px" 
+             alt="MetelePlay" />
+      </div>
+      
+      <!-- Contenido principal -->
+      <p class="title">{{userName}}, ¡Cuenta activada exitosamente!</p>
+      
+      <p>¡Hola {{userName}}!</p>
+      <p>Su cuenta ha sido verificada y ya puede disfrutar de todos nuestros servicios premium compartidos en MetelePlay.</p>
+      
+      <div class="features-box">
+        <h3 style="color: #28a745; margin-top: 0;">🎁 ¿Qué puede hacer ahora?</h3>
+        <ul style="color: #333;">
+          <li>🎬 Explorar servicios premium (Netflix, Disney+, Spotify)</li>
+          <li>💰 Comprar suscripciones compartidas a precios increíbles</li>
+          <li>👤 Acceder a su panel de usuario personalizado</li>
+          <li>📋 Revisar el historial de órdenes</li>
+          <li>🔐 Recibir credenciales de acceso automáticamente</li>
+        </ul>
+      </div>
+      
+      {{#if serviceName}}
+      <div style="background: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #0056b3; margin-top: 0;">🎊 ¡Servicio contratado!</h3>
+        <p><strong>Servicio:</strong> {{serviceName}}</p>
+        {{#if planName}}<p><strong>Plan:</strong> {{planName}}</p>{{/if}}
+        {{#if accountCredentials}}
+        <p><strong>Sus credenciales están siendo procesadas...</strong></p>
+        {{/if}}
+      </div>
+      {{/if}}
+      
+      <div style="text-align: center;">
+        <a href="{{frontendUrl '/dashboard'}}" class="btn-primary">
+          🚀 Ir a mi cuenta
+        </a>
+      </div>
+      
+      <!-- Footer -->
+      <footer class="footer">
+        <p style="margin-bottom:16px">
+          🌹 Mis mejores deseos,<br>
+          Equipo MetelePlay
+        </p>
+        
+        <div style="margin-bottom:40px">
+          <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" 
+               width="104px" 
+               height="17px" 
+               alt="MetelePlay" />
+        </div>
+      </footer>
+      
+    </section>
+    
+    <!-- Copyright -->
+    <div class="copyright">
+      Copyright © 2020-{{currentYear}} GAMESGO Ltd.- All Rights Reserved
+    </div>
+    
+  </div>
+</body>
+</html>

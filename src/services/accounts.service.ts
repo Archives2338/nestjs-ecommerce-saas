@@ -214,7 +214,7 @@ export class AccountsService {
     try {
       const account = await this.accountModel
         .findById(accountId)
-        .select('+credentials.password +credentials.recovery_codes') // Incluir datos sensibles
+        .select('+credentials.email +credentials.password +credentials.recovery_codes') // Incluir datos sensibles
         .exec();
 
       if (!account) {
@@ -338,7 +338,11 @@ export class AccountsService {
    */
   async assignAccount(accountId: string, assignAccountDto: AssignAccountDto) {
     try {
-      const account = await this.accountModel.findById(accountId).exec();
+      // ✅ Importante: Incluir credenciales que tienen select: false
+      const account = await this.accountModel
+        .findById(accountId)
+        .select('+credentials.email +credentials.password') // Incluir campos sensibles
+        .exec();
 
       if (!account) {
         throw new NotFoundException('Cuenta no encontrada');
@@ -352,6 +356,16 @@ export class AccountsService {
       const order = await this.orderModel.findOne({ out_trade_no: assignAccountDto.order_id }).exec();
       if (!order) {
         throw new NotFoundException('Orden no encontrada');
+      }
+
+      // ✅ Validar que las credenciales estén disponibles
+      if (!account.credentials.email || !account.credentials.password) {
+        this.logger.error('Account credentials missing:', { 
+          accountId, 
+          hasEmail: !!account.credentials.email,
+          hasPassword: !!account.credentials.password 
+        });
+        throw new ConflictException('Las credenciales de la cuenta están incompletas');
       }
 
       // Agregar asignación a la cuenta

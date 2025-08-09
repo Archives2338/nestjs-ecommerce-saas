@@ -10,7 +10,8 @@ export enum OrderStatus {
   ACTIVE = 'active',
   EXPIRED = 'expired',
   CANCELLED = 'cancelled',
-  SUSPENDED = 'suspended'
+  SUSPENDED = 'suspended',
+  REJECTED = 'rejected'
 }
 
 // Schema para items del pedido
@@ -235,6 +236,19 @@ export class Order extends Document {
 
   @Prop()
   paymentAmount?: number;
+
+  // CAMPOS DE VALIDACIÓN ADMINISTRATIVA
+  @Prop()
+  adminNotes?: string; // Notas del administrador
+
+  @Prop()
+  rejectionReason?: string; // Motivo de rechazo
+
+  @Prop()
+  validatedAt?: Date; // Fecha de validación
+
+  @Prop()
+  validatedBy?: string; // ID del admin que validó
 
   // TIMESTAMPS (agregados por { timestamps: true })
   createdAt?: Date;
