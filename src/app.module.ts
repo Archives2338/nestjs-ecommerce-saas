@@ -14,6 +14,8 @@ import { ServicesModule } from './services/services.module';
 import { CustomerAuthModule } from './customers/customer-auth.module';
 import { OrdersModule } from './orders/orders.module';
 import { AdminPaymentValidationModule } from './admin/admin-payment-validation.module';
+import { AdminAuthModule } from './admin/admin-auth.module';
+import { AdminServicesModule } from './admin/admin-services.module';
 import { TestModule } from './test/test.module';
 import { getDatabaseConfig } from './config/database.config';
 
@@ -61,6 +63,8 @@ import { getDatabaseConfig } from './config/database.config';
     CustomerAuthModule,
     OrdersModule,
     AdminPaymentValidationModule,
+    AdminAuthModule,
+    AdminServicesModule,
     TestModule,
   ],
   controllers: [AppController],

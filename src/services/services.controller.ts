@@ -10,7 +10,8 @@ import {
   Query, 
   Logger,
   HttpStatus,
-  HttpCode
+  HttpCode,
+  UseGuards
 } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { GetSkuListDto, CreateServiceDto, UpdateServiceDto } from './dto/service.dto';
@@ -187,6 +188,248 @@ export class ServicesController {
       return {
         code: 1,
         message: 'Error al cambiar estado del servicio',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  // ==================== ENDPOINTS DE ADMINISTRACIÓN ====================
+
+  /**
+   * Listar todos los servicios para administración con paginación
+   * GET /api/admin/services
+   */
+  @Get('admin/services')
+  @HttpCode(HttpStatus.OK)
+  async getAllServicesForAdmin(
+    @Query('language') language: string = 'es',
+    @Query('active') active?: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10'
+  ) {
+    try {
+      this.logger.log(`Admin getting all services - language: ${language}, active: ${active}, page: ${page}, limit: ${limit}`);
+      
+      const result = await this.servicesService.getAllServicesForAdmin({
+        language,
+        active: active !== undefined ? active === 'true' : undefined,
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10)
+      });
+
+      return {
+        code: 0,
+        message: 'Servicios obtenidos exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: result
+      };
+    } catch (error) {
+      this.logger.error('Error getting all services for admin:', error);
+      return {
+        code: 1,
+        message: 'Error al obtener servicios',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Obtener estadísticas de servicios para administración
+   * GET /api/admin/services/stats
+   */
+  @Get('admin/services/stats')
+  @HttpCode(HttpStatus.OK)
+  async getServicesStatsForAdmin(@Query('language') language: string = 'es') {
+    try {
+      this.logger.log(`Getting services stats for language: ${language}`);
+      
+      const stats = await this.servicesService.getServicesStats(language);
+
+      return {
+        code: 0,
+        message: 'Estadísticas obtenidas exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: stats
+      };
+    } catch (error) {
+      this.logger.error('Error getting services stats:', error);
+      return {
+        code: 1,
+        message: 'Error al obtener estadísticas',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Obtener un servicio específico por ID para administración
+   * GET /api/admin/services/:id
+   */
+  @Get('admin/services/:id')
+  @HttpCode(HttpStatus.OK)
+  async getServiceByIdForAdmin(@Param('id') id: string) {
+    try {
+      this.logger.log(`Getting service by ID for admin: ${id}`);
+      
+      const service = await this.servicesService.getServiceById(id);
+
+      return {
+        code: 0,
+        message: 'Servicio obtenido exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: service
+      };
+    } catch (error) {
+      this.logger.error(`Error getting service by ID ${id}:`, error);
+      return {
+        code: 1,
+        message: 'Error al obtener el servicio',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Actualizar un servicio por ID para administración
+   * PUT /api/admin/services/:id
+   */
+  @Put('admin/services/:id')
+  @HttpCode(HttpStatus.OK)
+  async updateServiceByIdForAdmin(
+    @Param('id') id: string,
+    @Body() updateServiceDto: UpdateServiceDto,
+    @Query('language') language: string = 'es'
+  ) {
+    try {
+      this.logger.log(`Updating service ID for admin: ${id}`);
+      
+      // Buscar el servicio por ID de MongoDB
+      const service = await this.servicesService.getServiceById(id);
+      
+      // Actualizar usando language y type_id
+      const result = await this.servicesService.updateService(
+        language, 
+        service.type_id, 
+        updateServiceDto
+      );
+
+      return {
+        code: 0,
+        message: 'Servicio actualizado exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: result
+      };
+    } catch (error) {
+      this.logger.error(`Error updating service ${id}:`, error);
+      return {
+        code: 1,
+        message: 'Error al actualizar el servicio',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Cambiar estado de un servicio para administración
+   * POST /api/admin/services/:id/toggle-status
+   */
+  @Post('admin/services/:id/toggle-status')
+  @HttpCode(HttpStatus.OK)
+  async toggleServiceStatusForAdmin(
+    @Param('id') id: string,
+    @Query('language') language: string = 'es'
+  ) {
+    try {
+      this.logger.log(`Toggling status for service ID: ${id}`);
+      
+      // Buscar el servicio por ID de MongoDB
+      const service = await this.servicesService.getServiceById(id);
+      
+      // Cambiar estado usando language y type_id
+      const result = await this.servicesService.toggleServiceStatus(
+        language, 
+        service.type_id
+      );
+
+      return {
+        code: 0,
+        message: 'Estado del servicio actualizado exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: result
+      };
+    } catch (error) {
+      this.logger.error(`Error toggling service status ${id}:`, error);
+      return {
+        code: 1,
+        message: 'Error al cambiar el estado del servicio',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Eliminar un servicio para administración
+   * DELETE /api/admin/services/:id
+   */
+  @Delete('admin/services/:id')
+  @HttpCode(HttpStatus.OK)
+  async deleteServiceForAdmin(
+    @Param('id') id: string,
+    @Query('language') language: string = 'es'
+  ) {
+    try {
+      this.logger.log(`Deleting service ID for admin: ${id}`);
+      
+      // Buscar el servicio por ID de MongoDB
+      const service = await this.servicesService.getServiceById(id);
+      
+      // Eliminar usando language y type_id
+      const result = await this.servicesService.deleteService(
+        language, 
+        service.type_id
+      );
+
+      return {
+        code: 0,
+        message: 'Servicio eliminado exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: result
+      };
+    } catch (error) {
+      this.logger.error(`Error deleting service ${id}:`, error);
+      return {
+        code: 1,
+        message: 'Error al eliminar el servicio',
         toast: 1,
         redirect_url: '',
         type: 'error',

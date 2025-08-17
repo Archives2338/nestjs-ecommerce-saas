@@ -793,6 +793,285 @@ export class CustomerAuthService {
   }
 
   /**
+   * Actualizar perfil del cliente
+   */
+  async updateProfile(customerId: string, updateDto: UpdateCustomerProfileDto): Promise<CustomerAuthResponse> {
+    try {
+
+      console.log('Update Profile DTO:', updateDto);
+      console.log('Customer ID:', customerId);
+      
+      this.logger.log(`Profile update request for customer: ${customerId}`);
+
+      // Buscar cliente por ID
+      const customer = await this.customerModel.findById(customerId);
+
+      if (!customer || !customer.isActive) {
+        return {
+          code: 1,
+          message: 'Cliente no encontrado o inactivo',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      // Validar y actualizar solo los campos proporcionados
+      const updateFields: Partial<any> = {};
+
+      if (updateDto.firstName !== undefined) {
+        if (updateDto.firstName.trim().length === 0) {
+          return {
+            code: 1,
+            message: 'El nombre no puede estar vacío',
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+        updateFields.firstName = updateDto.firstName.trim();
+      }
+
+      if (updateDto.lastName !== undefined) {
+        if (updateDto.lastName.trim().length === 0) {
+          return {
+            code: 1,
+            message: 'El apellido no puede estar vacío',
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+        updateFields.lastName = updateDto.lastName.trim();
+      }
+
+      if (updateDto.phone !== undefined) {
+        // Validar formato de teléfono básico
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        if (updateDto.phone && !phoneRegex.test(updateDto.phone)) {
+          return {
+            code: 1,
+            message: 'Formato de teléfono inválido',
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+        updateFields.phone = updateDto.phone;
+      }
+
+      if (updateDto.preferredLanguage !== undefined) {
+        updateFields.preferredLanguage = updateDto.preferredLanguage;
+      }
+
+      if (updateDto.preferredCurrency !== undefined) {
+        updateFields.preferredCurrency = updateDto.preferredCurrency;
+      }
+
+      // Si no hay campos para actualizar
+      if (Object.keys(updateFields).length === 0) {
+        return {
+          code: 1,
+          message: 'No se proporcionaron campos para actualizar',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      // Actualizar los campos
+      Object.assign(customer, updateFields);
+      await customer.save();
+
+      this.logger.log(`Profile updated successfully for customer: ${customer.email}`);
+
+      // Devolver perfil actualizado
+      return {
+        code: 0,
+        message: 'Perfil actualizado exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: {
+          customer: {
+            id: customer._id.toString(),
+            email: customer.email,
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            avatar: customer.avatar,
+            emailVerified: customer.emailVerified,
+            preferredLanguage: customer.preferredLanguage,
+            // Campos adicionales para la respuesta completa
+            phone: customer.phone,
+            preferredCurrency: customer.preferredCurrency
+          } as any
+        }
+      };
+
+    } catch (error) {
+      this.logger.error('Error updating customer profile:', error);
+      return {
+        code: 1,
+        message: 'Error interno del servidor',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
+   * Cambiar contraseña del cliente
+   */
+  async changePassword(customerId: string, changeDto: ChangePasswordDto): Promise<CustomerAuthResponse> {
+    try {
+      this.logger.log(`Password change request for customer: ${customerId}`);
+
+      // Buscar cliente por ID
+      const customer = await this.customerModel.findById(customerId);
+
+      if (!customer || !customer.isActive) {
+        return {
+          code: 1,
+          message: 'Cliente no encontrado o inactivo',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      // Verificar contraseña actual
+      if (!customer.password) {
+        return {
+          code: 1,
+          message: 'No se puede cambiar la contraseña para este tipo de cuenta',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(changeDto.currentPassword, customer.password);
+      if (!isCurrentPasswordValid) {
+        return {
+          code: 1,
+          message: 'La contraseña actual es incorrecta',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      // Verificar que la nueva contraseña no sea igual a la actual
+      const isSamePassword = await bcrypt.compare(changeDto.newPassword, customer.password);
+      if (isSamePassword) {
+        return {
+          code: 1,
+          message: 'La nueva contraseña debe ser diferente a la actual',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      // Validar criterios de la nueva contraseña (mismos que el registro)
+      if (changeDto.newPassword.length < 8) {
+        return {
+          code: 1,
+          message: 'La nueva contraseña debe tener al menos 8 caracteres',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      if (changeDto.newPassword.length > 50) {
+        return {
+          code: 1,
+          message: 'La nueva contraseña no puede exceder 50 caracteres',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        };
+      }
+
+      // Hash de la nueva contraseña (mismos parámetros que el registro)
+      const saltRounds = 12;
+      const hashedNewPassword = await bcrypt.hash(changeDto.newPassword, saltRounds);
+
+      // Actualizar contraseña
+      customer.password = hashedNewPassword;
+      customer.lastLoginAt = new Date(); // Actualizar última actividad
+      await customer.save();
+
+      // 📧 Enviar email de confirmación de cambio de contraseña
+      try {
+        const emailData = {
+          userName: customer.firstName || customer.email.split('@')[0],
+          changeTime: new Date().toLocaleString('es-ES', {
+            timeZone: 'America/Lima',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          loginUrl: `${process.env.FRONTEND_URL || 'https://meteleplay.com'}/login`
+        };
+
+        // Usar el nuevo método específico para cambio de contraseña
+        const emailSent = await this.emailService.sendPasswordChangeNotification(
+          customer.email,
+          emailData
+        );
+
+        if (emailSent) {
+          this.logger.log(`✅ Password change notification sent to: ${customer.email}`);
+        } else {
+          this.logger.warn(`⚠️ Failed to send password change notification to: ${customer.email}`);
+        }
+      } catch (emailError) {
+        this.logger.error(`❌ Error sending password change notification to ${customer.email}:`, emailError);
+        // No fallar el proceso si el email falla
+      }
+
+      this.logger.log(`Password changed successfully for customer: ${customer.email}`);
+
+      return {
+        code: 0,
+        message: 'Contraseña cambiada exitosamente',
+        toast: 0,
+        redirect_url: '',
+        type: 'success',
+        data: null
+      };
+
+    } catch (error) {
+      this.logger.error('Error changing password:', error);
+      return {
+        code: 1,
+        message: 'Error interno del servidor',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      };
+    }
+  }
+
+  /**
    * Generar JWT token
    */
   private generateJwtToken(customer: CustomerDocument): string {

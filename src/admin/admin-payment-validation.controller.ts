@@ -2,9 +2,12 @@ import { Controller, Post, Put, Get, Param, Body, UseGuards, HttpStatus, HttpCod
 
 import { ValidatePaymentDto, RejectPaymentDto, GetPendingPaymentsDto } from './dto/admin-payment-validation.dto';
 import { AdminPaymentValidationService } from './admin-payment-validation.service';
-// import { AdminJwtAuthGuard } from '../auth/guards/admin-jwt-auth.guard'; // Implementar guard de admin
+import { AdminJwtAuthGuard } from './guards/admin-jwt-auth.guard';
+import { AdminPermissionGuard } from './guards/admin-permission.guard';
+import { Permissions } from './decorators/permissions.decorator';
 
 @Controller('api/admin/payments')
+@UseGuards(AdminJwtAuthGuard, AdminPermissionGuard)
 export class AdminPaymentValidationController {
   constructor(private readonly adminPaymentService: AdminPaymentValidationService) {}
 
@@ -13,7 +16,7 @@ export class AdminPaymentValidationController {
    * GET /api/admin/payments/pending
    */
   @Get('pending')
-  // @UseGuards(AdminJwtAuthGuard) // Descomenta cuando implementes autenticación de admin
+  @Permissions('payments:validate', 'payments:read')
   async getPendingPayments(@Body() filters?: GetPendingPaymentsDto) {
     return await this.adminPaymentService.getPendingPayments(filters);
   }
@@ -23,7 +26,7 @@ export class AdminPaymentValidationController {
    * PUT /api/admin/payments/:orderId/approve
    */
   @Put(':orderId/approve')
-  // @UseGuards(AdminJwtAuthGuard)
+  @Permissions('payments:validate')
   @HttpCode(HttpStatus.OK)
   async approvePayment(
     @Param('orderId') orderId: string,
@@ -37,7 +40,7 @@ export class AdminPaymentValidationController {
    * PUT /api/admin/payments/:orderId/reject
    */
   @Put(':orderId/reject')
-  // @UseGuards(AdminJwtAuthGuard)
+  @Permissions('payments:reject')
   @HttpCode(HttpStatus.OK)
   async rejectPayment(
     @Param('orderId') orderId: string,
@@ -51,7 +54,7 @@ export class AdminPaymentValidationController {
    * GET /api/admin/payments/:orderId/details
    */
   @Get(':orderId/details')
-  // @UseGuards(AdminJwtAuthGuard)
+  @Permissions('payments:read', 'payments:validate')
   async getPaymentDetails(@Param('orderId') orderId: string) {
     return await this.adminPaymentService.getPaymentDetails(orderId);
   }
@@ -61,7 +64,7 @@ export class AdminPaymentValidationController {
    * GET /api/admin/payments/stats
    */
   @Get('stats')
-  // @UseGuards(AdminJwtAuthGuard)
+  @Permissions('payments:read')
   async getValidationStats() {
     return await this.adminPaymentService.getValidationStats();
   }
@@ -71,7 +74,7 @@ export class AdminPaymentValidationController {
    * POST /api/admin/payments/:orderId/retry-assignment
    */
   @Post(':orderId/retry-assignment')
-  // @UseGuards(AdminJwtAuthGuard)
+  @Permissions('payments:validate')
   async retryCredentialAssignment(@Param('orderId') orderId: string) {
     return await this.adminPaymentService.retryCredentialAssignment(orderId);
   }

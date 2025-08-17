@@ -250,3 +250,62 @@ export class UpdateServiceDto {
   @IsBoolean()
   active?: boolean;
 }
+
+// ==================== DTOs PARA ADMINISTRACIÓN ====================
+
+export class GetAllServicesAdminDto {
+  @IsOptional()
+  @IsString()
+  language?: string = 'es';
+
+  @IsOptional()
+  @IsString()
+  active?: string;
+
+  @IsOptional()
+  @IsString()
+  page?: string = '1';
+
+  @IsOptional()
+  @IsString()
+  limit?: string = '10';
+}
+
+export class AdminServiceSummaryDto {
+  id: string;
+  type_id: number;
+  name: string;
+  subtitle: string;
+  icon: string;
+  active: boolean;
+  sort: number;
+  created_at: Date;
+  updated_at: Date;
+  total_plans: number;
+  price_range: {
+    min: number;
+    max: number;
+    currency: string;
+  };
+  summary: {
+    total_months: number;
+    total_screens: number;
+    has_repayment: boolean;
+  };
+}
+
+export class AdminServicesStatsDto {
+  overview: {
+    total_services: number;
+    active_services: number;
+    inactive_services: number;
+    services_with_plans: number;
+    total_plans: number;
+  };
+  popular_services: Array<{
+    id: number;
+    name: string;
+    sort_order: number;
+  }>;
+  last_updated: string;
+}

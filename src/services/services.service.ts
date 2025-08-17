@@ -336,4 +336,235 @@ export class ServicesService {
       };
     }
   }
+
+  // ==================== MÉTODOS PARA ADMINISTRACIÓN ====================
+
+  /**
+   * Obtener todos los servicios para administración con paginación y filtros
+   */
+  async getAllServicesForAdmin(options: {
+    language: string;
+    active?: boolean;
+    page: number;
+    limit: number;
+  }) {
+    try {
+      const { language, active, page, limit } = options;
+      const skip = (page - 1) * limit;
+
+      // Construir filtros
+      const filter: any = { language };
+      if (active !== undefined) {
+        filter.active = active;
+      }
+
+      // Obtener servicios con paginación
+      const [services, total] = await Promise.all([
+        this.serviceModel
+          .find(filter)
+          .sort({ sort: 1, created_at: -1 })
+          .skip(skip)
+          .limit(limit)
+          .exec(),
+        this.serviceModel.countDocuments(filter)
+      ]);
+
+      // Formatear datos para administración
+      const formattedServices = services.map(service => ({
+        id: service._id.toString(),
+        type_id: service.type_id,
+        name: service.name,
+        subtitle: service.subtitle,
+        icon: service.icon,
+        active: service.active,
+        sort: service.sort,
+        created_at: service.created_at,
+        updated_at: service.updated_at,
+        // Estadísticas de planes
+        total_plans: this.countTotalPlans(service.plan),
+        price_range: this.getPriceRange(service.plan),
+        // Información resumida
+        summary: {
+          total_months: service.plan?.month?.length || 0,
+          total_screens: service.plan?.screen?.length || 0,
+          has_repayment: service.repayment?.month?.length > 0 || service.repayment?.screen?.length > 0
+        }
+      }));
+
+      return {
+        services: formattedServices,
+        pagination: {
+          current_page: page,
+          total_pages: Math.ceil(total / limit),
+          total_items: total,
+          items_per_page: limit,
+          has_next: page < Math.ceil(total / limit),
+          has_prev: page > 1
+        }
+      };
+
+    } catch (error) {
+      this.logger.error('Error getting all services for admin:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener estadísticas generales de servicios
+   */
+  async getServicesStats(language: string) {
+    try {
+      const [
+        totalServices,
+        activeServices,
+        inactiveServices,
+        servicesWithPlans,
+        totalPlans
+      ] = await Promise.all([
+        this.serviceModel.countDocuments({ language }),
+        this.serviceModel.countDocuments({ language, active: true }),
+        this.serviceModel.countDocuments({ language, active: false }),
+        this.serviceModel.countDocuments({ 
+          language, 
+          $or: [
+            { 'plan.month.0': { $exists: true } },
+            { 'plan.screen.0': { $exists: true } }
+          ]
+        }),
+        this.serviceModel.aggregate([
+          { $match: { language } },
+          {
+            $project: {
+              planCount: {
+                $add: [
+                  { $size: { $ifNull: ['$plan.month', []] } },
+                  { $size: { $ifNull: ['$plan.screen', []] } }
+                ]
+              }
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              totalPlans: { $sum: '$planCount' }
+            }
+          }
+        ])
+      ]);
+
+      // Obtener servicios más populares (basado en sort)
+      const popularServices = await this.serviceModel
+        .find({ language, active: true })
+        .sort({ sort: 1 })
+        .limit(5)
+        .select('name type_id sort')
+        .exec();
+
+      return {
+        overview: {
+          total_services: totalServices,
+          active_services: activeServices,
+          inactive_services: inactiveServices,
+          services_with_plans: servicesWithPlans,
+          total_plans: totalPlans[0]?.totalPlans || 0
+        },
+        popular_services: popularServices.map(service => ({
+          id: service.type_id,
+          name: service.name,
+          sort_order: service.sort
+        })),
+        last_updated: new Date().toISOString()
+      };
+
+    } catch (error) {
+      this.logger.error('Error getting services stats:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener un servicio por ID para administración
+   */
+  async getServiceById(id: string) {
+    try {
+      const service = await this.serviceModel.findById(id).exec();
+      
+      if (!service) {
+        throw new NotFoundException(`Service with ID ${id} not found`);
+      }
+
+      return {
+        ...service.toObject(),
+        id: service._id.toString(),
+        type_id: service.type_id, // Asegurar que type_id esté disponible
+        plan_summary: {
+          total_months: service.plan?.month?.length || 0,
+          total_screens: service.plan?.screen?.length || 0,
+          total_plans: this.countTotalPlans(service.plan),
+          price_range: this.getPriceRange(service.plan)
+        }
+      };
+
+    } catch (error) {
+      this.logger.error(`Error getting service by ID ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // ==================== MÉTODOS AUXILIARES ====================
+
+  /**
+   * Contar total de planes en un servicio
+   */
+  private countTotalPlans(plan: any): number {
+    if (!plan) return 0;
+    
+    let total = 0;
+    
+    // Contar planes por mes
+    if (plan.month && Array.isArray(plan.month)) {
+      plan.month.forEach((monthGroup: any) => {
+        if (monthGroup.screen && Array.isArray(monthGroup.screen)) {
+          total += monthGroup.screen.length;
+        }
+      });
+    }
+    
+    return total;
+  }
+
+  /**
+   * Obtener rango de precios de un servicio
+   */
+  private getPriceRange(plan: any): { min: number; max: number; currency: string } {
+    if (!plan) return { min: 0, max: 0, currency: 'PEN' };
+    
+    const prices: number[] = [];
+    
+    // Recopilar todos los precios
+    if (plan.month && Array.isArray(plan.month)) {
+      plan.month.forEach((monthGroup: any) => {
+        if (monthGroup.screen && Array.isArray(monthGroup.screen)) {
+          monthGroup.screen.forEach((screenPlan: any) => {
+            if (screenPlan.sale_price) {
+              prices.push(parseFloat(screenPlan.sale_price));
+            }
+            if (screenPlan.original_price) {
+              prices.push(parseFloat(screenPlan.original_price));
+            }
+          });
+        }
+      });
+    }
+    
+    if (prices.length === 0) {
+      return { min: 0, max: 0, currency: 'PEN' };
+    }
+    
+    return {
+      min: Math.min(...prices),
+      max: Math.max(...prices),
+      currency: 'PEN'
+    };
+  }
 }

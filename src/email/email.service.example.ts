@@ -404,7 +404,38 @@ export class GamsGoEmailService {
       return false;
     }
   }
+
+  /**
+   * 🔐 Enviar notificación de cambio de contraseña
+   */
+  async sendPasswordChangeNotification(
+    email: string, 
+    data: {
+      userName: string;
+      changeTime: string;
+      loginUrl: string;
+    }
+  ): Promise<boolean> {
+    return this.sendEmailWithTemplate(
+      email,
+      'password-change',
+      '🔐 Contraseña Actualizada - MetelePlay',
+      data
+    );
+  }
+}
+
+// Interfaces para tipo de datos de email
+interface PasswordChangeData {
+  userName: string;
+  changeTime: string;
+  loginUrl: string;
 }
 
 // Exports
-export { VerificationEmailData, WelcomeEmailData, AccountCredentialsData };
+export { 
+  VerificationEmailData, 
+  WelcomeEmailData, 
+  AccountCredentialsData,
+  PasswordChangeData 
+};

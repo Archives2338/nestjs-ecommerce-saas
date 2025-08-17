@@ -141,17 +141,22 @@ export class UpdateCustomerProfileDto {
   preferredLanguage?: string;
 
   @IsOptional()
-  @IsEnum(['USD', 'EUR', 'MXN'])
+  @IsEnum(['USD', 'EUR', 'PEN'])
   preferredCurrency?: string;
 }
 
 export class ChangePasswordDto {
   @IsString({ message: 'Contraseña actual es requerida' })
+  @IsNotEmpty({ message: 'Contraseña actual no puede estar vacía' })
   currentPassword: string;
 
   @IsString({ message: 'Nueva contraseña es requerida' })
-  @MinLength(8, { message: 'Contraseña debe tener al menos 8 caracteres' })
-  @MaxLength(50, { message: 'Contraseña no puede exceder 50 caracteres' })
+  @IsNotEmpty({ message: 'Nueva contraseña no puede estar vacía' })
+  @MinLength(8, { message: 'Nueva contraseña debe tener al menos 8 caracteres' })
+  @MaxLength(50, { message: 'Nueva contraseña no puede exceder 50 caracteres' })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]+$/, {
+    message: 'Nueva contraseña debe contener al menos una letra minúscula, una mayúscula y un número'
+  })
   newPassword: string;
 }
 

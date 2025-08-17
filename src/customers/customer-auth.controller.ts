@@ -9,8 +9,14 @@ import {
   Logger,
   HttpStatus,
   HttpCode,
-  ValidationPipe
+  ValidationPipe,
+  UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
+  HttpException
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CustomerJwtAuthGuard } from '../auth/guards/customer-jwt-auth.guard';
 import { CustomerAuthService } from './customer-auth.service';
 import { 
   RegisterCustomerDto, 
@@ -20,6 +26,7 @@ import {
   VerifyEmailDto,
   UpdateCustomerProfileDto,
   ChangePasswordDto,
+  CustomerAuthResponse,
   GoogleOAuthDto,
   FacebookOAuthDto,
   CheckEmailDto,
@@ -212,21 +219,55 @@ export class CustomerAuthController {
    * PUT /api/customer/auth/profile
    */
   @Put('profile')
-  // @UseGuards(CustomerAuthGuard) // TODO: Implementar guard
+  @UseGuards(CustomerJwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   async updateProfile(@Body(ValidationPipe) updateDto: UpdateCustomerProfileDto, @Req() req: any) {
-    // TODO: Implementar actualización de perfil
-    const customerId = req.user?.id;
-    
-    this.logger.log(`Profile update request for customer: ${customerId}`);
-    
-    return {
-      code: 1,
-      message: 'Actualización de perfil no implementada aún',
-      toast: 1,
-      redirect_url: '',
-      type: 'error',
-      data: null
-    };
+    try {
+      // const customerId = req.user?.id;
+      const customerId = req.user?.userId || req.user?.sub || req.user?.id;
+      
+      this.logger.log(`Profile update request for customer: ${customerId}`);
+      this.logger.log(`Update data: ${JSON.stringify(updateDto, null, 2)}`);
+      
+      const result = await this.customerAuthService.updateProfile(customerId, updateDto);
+      
+      this.logger.log(`Profile update result for customer ${customerId}: ${result.code === 0 ? 'SUCCESS' : 'FAILED'}`);
+      return result;
+      
+    } catch (error: any) {
+      this.logger.error(`Profile update error: ${error.message}`, error.stack);
+      
+      if (error.name === 'UnauthorizedError' || error.status === 401) {
+        throw new UnauthorizedException({
+          code: 1,
+          message: 'No autorizado para actualizar perfil',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        });
+      }
+      
+      if (error.name === 'ValidationError' || error.status === 400) {
+        throw new BadRequestException({
+          code: 1,
+          message: error.message || 'Datos de perfil inválidos',
+          toast: 1,
+          redirect_url: '',
+          type: 'error',
+          data: null
+        });
+      }
+      
+      throw new HttpException({
+        code: 1,
+        message: 'Error interno del servidor',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
@@ -234,21 +275,65 @@ export class CustomerAuthController {
    * POST /api/customer/auth/change-password
    */
   @Post('change-password')
-  // @UseGuards(CustomerAuthGuard) // TODO: Implementar guard
-  async changePassword(@Body(ValidationPipe) changeDto: ChangePasswordDto, @Req() req: any) {
-    // TODO: Implementar cambio de contraseña
-    const customerId = req.user?.id;
-    
-    this.logger.log(`Password change request for customer: ${customerId}`);
-    
-    return {
-      code: 1,
-      message: 'Cambio de contraseña no implementado aún',
-      toast: 1,
-      redirect_url: '',
-      type: 'error',
-      data: null
-    };
+  @UseGuards(CustomerJwtAuthGuard)
+  async changePassword(
+    @Body(ValidationPipe) changeDto: ChangePasswordDto, 
+    @Req() req: any
+  ): Promise<CustomerAuthResponse> {
+    try {
+      const customerId = req.user?.userId || req.user?.sub || req.user?.id;
+      
+      if (!customerId) {
+        this.logger.warn('Change password attempt without valid customer ID');
+        throw new UnauthorizedException({
+          code: 1,
+          message: 'Token inválido o expirado',
+          toast: 1,
+          redirect_url: '/login',
+          type: 'error',
+          data: null
+        });
+      }
+
+      this.logger.log(`Password change request for customer: ${customerId}`);
+      
+      const result = await this.customerAuthService.changePassword(customerId, changeDto);
+      
+      // Si hay error en el resultado, lanzar excepción HTTP apropiada
+      if (result.code !== 0) {
+        if (result.message.includes('Token inválido') || result.message.includes('No autorizado')) {
+          throw new UnauthorizedException(result);
+        } else if (result.message.includes('incorrecta') || result.message.includes('diferente')) {
+          throw new BadRequestException(result);
+        } else if (result.message.includes('no encontrado')) {
+          throw new NotFoundException(result);
+        } else {
+          throw new BadRequestException(result);
+        }
+      }
+      
+      return result;
+      
+    } catch (error) {
+      this.logger.error('Error in changePassword endpoint:', error);
+      
+      // Si ya es una excepción HTTP, re-lanzarla
+      if (error instanceof UnauthorizedException || 
+          error instanceof BadRequestException || 
+          error instanceof NotFoundException) {
+        throw error;
+      }
+      
+      // Para errores no manejados, devolver 500
+      throw new BadRequestException({
+        code: 1,
+        message: 'Error interno del servidor',
+        toast: 1,
+        redirect_url: '',
+        type: 'error',
+        data: null
+      });
+    }
   }
 
   /**

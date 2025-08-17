@@ -296,4 +296,143 @@ export class TestEmailController {
       };
     }
   }
+
+  /**
+   * 🔐 Test Password Change Notification Email
+   */
+  @Post('test-password-change')
+  async testPasswordChangeEmail(@Body() dto: { email: string, userName?: string }) {
+    try {
+      this.logger.log(`🧪 Testing password change notification email to: ${dto.email}`);
+
+      const testData = {
+        userName: dto.userName || 'Usuario de Prueba',
+        changeTime: new Date().toLocaleString('es-ES', {
+          timeZone: 'America/Lima',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        loginUrl: 'https://meteleplay.com/login'
+      };
+
+      // Test usando el servicio de email con template
+      const emailSent = await this.gamsGoEmailService.sendPasswordChangeNotification(
+        dto.email,
+        testData
+      );
+
+      if (emailSent) {
+        this.logger.log(`✅ Test password change email sent successfully to: ${dto.email}`);
+        return {
+          success: true,
+          message: `✅ Email de cambio de contraseña enviado exitosamente a ${dto.email}`,
+          email: dto.email,
+          data: testData
+        };
+      } else {
+        this.logger.warn(`⚠️ Failed to send test password change email to: ${dto.email}`);
+        return {
+          success: false,
+          message: `⚠️ Failed to send password change email to ${dto.email}`,
+          email: dto.email
+        };
+      }
+
+    } catch (error) {
+      this.logger.error('Test password change email failed:', error);
+      return { 
+        success: false, 
+        message: `❌ Error: ${error instanceof Error ? error.message : String(error)}`,
+        email: dto.email 
+      };
+    }
+  }
+
+  /**
+   * 🔗 Test Complete Change Password Flow
+   */
+  @Post('test-change-password-flow')
+  async testChangePasswordFlow(@Body() dto: { email: string, userName?: string }) {
+    try {
+      this.logger.log(`🧪 Testing complete change password flow for: ${dto.email}`);
+
+      const userName = dto.userName || 'Usuario de Prueba';
+      const results = [];
+
+      // 1. Test notification email
+      const notificationData = {
+        userName: userName,
+        changeTime: new Date().toLocaleString('es-ES', {
+          timeZone: 'America/Lima',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        loginUrl: 'https://meteleplay.com/login'
+      };
+
+      const notificationSent = await this.gamsGoEmailService.sendPasswordChangeNotification(
+        dto.email,
+        notificationData
+      );
+
+      results.push({
+        step: '🔐 Password Change Notification',
+        success: notificationSent,
+        message: notificationSent ? 
+          '✅ Notification email sent successfully' : 
+          '❌ Failed to send notification email'
+      });
+
+      // 2. Test welcome email (as confirmation)
+      const welcomeData = {
+        userName: userName,
+        serviceName: 'MetelePlay',
+        planName: 'Cuenta Actualizada'
+      };
+
+      const welcomeSent = await this.gamsGoEmailService.sendWelcomeEmail(
+        dto.email,
+        welcomeData
+      );
+
+      results.push({
+        step: '🎉 Welcome/Confirmation Email',
+        success: welcomeSent,
+        message: welcomeSent ? 
+          '✅ Welcome email sent successfully' : 
+          '❌ Failed to send welcome email'
+      });
+
+      const overallSuccess = results.every(result => result.success);
+
+      this.logger.log(`${overallSuccess ? '✅' : '❌'} Change password flow test completed for: ${dto.email}`);
+
+      return {
+        success: overallSuccess,
+        message: `${overallSuccess ? '✅' : '❌'} Complete change password flow test ${overallSuccess ? 'successful' : 'failed'}`,
+        email: dto.email,
+        userName: userName,
+        results: results,
+        summary: {
+          total: results.length,
+          successful: results.filter(r => r.success).length,
+          failed: results.filter(r => !r.success).length
+        }
+      };
+
+    } catch (error) {
+      this.logger.error('Test change password flow failed:', error);
+      return { 
+        success: false, 
+        message: `❌ Error: ${error instanceof Error ? error.message : String(error)}`,
+        email: dto.email 
+      };
+    }
+  }
 }

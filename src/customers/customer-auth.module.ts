@@ -9,7 +9,7 @@ import { Customer, CustomerSchema } from './schemas/customer.schema';
 import { VerificationCode, VerificationCodeSchema } from '../auth/schemas/verification-code.schema';
 import { EmailModule } from '../email/email.module';
 import { OrdersModule } from '../orders/orders.module';
-import { CustomerJwtStrategy } from '../orders/customer-jwt.strategy';
+import { CustomerJwtStrategy } from '../auth/guards/customer-jwt.strategy';
 
 @Module({
   imports: [
