@@ -6,18 +6,94 @@ import { AccountsController } from './accounts.controller';
 import { AccountsService } from './accounts.service';
 import { Service, ServiceSchema } from './schemas/service.schema';
 import { Account, AccountSchema } from './schemas/account.schema';
-import { Order, OrderSchema } from '../orders/schemas/order.schema'; // Cambio aquí
+import { Order, OrderSchema } from '../orders/schemas/order.schema';
+import { AdminAuthModule } from '../admin/admin-auth.module';
+
+// Nuevos schemas modulares
+import { 
+  ServiceMonthOption, 
+  ServiceMonthOptionSchema,
+  ServiceScreenOption,
+  ServiceScreenOptionSchema,
+  ServicePlan,
+  ServicePlanSchema
+} from './schemas-new';
+
+// Nuevos servicios modulares
+import {
+  ServiceMonthOptionService,
+  ServiceScreenOptionService,
+  ServicePlanService,
+  ServicePricingIntegrationService
+} from './services';
+
+// Nuevos controladores admin
+import {
+  AdminMonthOptionsController,
+  AdminScreenOptionsController,
+  AdminServicePlansController,
+  AdminServicePricingController
+} from './controllers';
 
 @Module({
   imports: [
+    AdminAuthModule, // Importar AdminAuthModule para acceso a AdminAuthService
     MongooseModule.forFeature([
+      // Schemas originales
       { name: Service.name, schema: ServiceSchema },
       { name: Account.name, schema: AccountSchema },
-      { name: Order.name, schema: OrderSchema } // Cambio aquí
+      { name: Order.name, schema: OrderSchema },
+      
+      // Nuevos schemas modulares
+      { 
+        name: ServiceMonthOption.name, 
+        schema: ServiceMonthOptionSchema,
+        collection: 'service_month_options'
+      },
+      { 
+        name: ServiceScreenOption.name, 
+        schema: ServiceScreenOptionSchema,
+        collection: 'service_screen_options'
+      },
+      { 
+        name: ServicePlan.name, 
+        schema: ServicePlanSchema,
+        collection: 'service_plans'
+      }
     ])
   ],
-  controllers: [ServicesController, AccountsController],
-  providers: [ServicesService, AccountsService],
-  exports: [ServicesService, AccountsService]
+  controllers: [
+    // Controladores originales
+    ServicesController, 
+    AccountsController,
+    
+    // Nuevos controladores admin
+    AdminMonthOptionsController,
+    AdminScreenOptionsController,
+    AdminServicePlansController,
+    AdminServicePricingController
+  ],
+  providers: [
+    // Servicios originales
+    ServicesService, 
+    AccountsService,
+    
+    // Nuevos servicios modulares
+    ServiceMonthOptionService,
+    ServiceScreenOptionService,
+    ServicePlanService,
+    ServicePricingIntegrationService
+  ],
+  exports: [
+    // Servicios originales
+    ServicesService, 
+    AccountsService,
+    
+    // Nuevos servicios modulares
+    ServiceMonthOptionService,
+    ServiceScreenOptionService,
+    ServicePlanService,
+    ServicePricingIntegrationService
+  ]
 })
 export class ServicesModule {}

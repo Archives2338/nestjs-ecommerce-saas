@@ -12,7 +12,9 @@
     "seed:tenants": "ts-node src/scripts/seed-tenants.ts",
     "seed:services": "ts-node src/scripts/seed-services.ts",
     "kill:ports": "./scripts/kill-nestjs.sh",
-    "restart": "./scripts/kill-nestjs.sh && npm run start:dev"
+    "restart": "./scripts/kill-nestjs.sh && npm run start:dev",
+    "db:audit": "ts-node scripts/run-audit.ts",
+    "db:migrate": "ts-node scripts/run-migration.ts"
   },
   "dependencies": {
     "@css-inline/css-inline": "^0.17.0",

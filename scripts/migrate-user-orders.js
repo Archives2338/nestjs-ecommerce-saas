@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 
 // Configuración de conexión
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/ecommerce';
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ecommerce';
 
 async function migrateUserOrdersToOrders() {
   const client = new MongoClient(MONGO_URI);

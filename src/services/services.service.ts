@@ -28,6 +28,15 @@ export class ServicesService {
         active: true
       }).exec();
 
+      // Filtrar arrays vacíos en plan.month y plan.screen
+      if (service && service.plan) {
+        if (Array.isArray(service.plan.month)) {
+          service.plan.month = service.plan.month.filter(m => Array.isArray(m.screen) && m.screen.length > 0);
+        }
+        if (Array.isArray(service.plan.screen)) {
+          service.plan.screen = service.plan.screen.filter(s => Array.isArray(s.month) && s.month.length > 0);
+        }
+      }
       if (!service) {
         throw new NotFoundException(`Service with type_id ${type_id} not found for language ${language}`);
       }
@@ -114,22 +123,10 @@ export class ServicesService {
   async createService(createServiceDto: CreateServiceDto) {
     try {
       this.logger.log(`Creating service: ${createServiceDto.name} for language: ${createServiceDto.language}`);
+// deseo crear un language es y un type_id automatico tambien
 
-      const existingService = await this.serviceModel.findOne({
-        type_id: createServiceDto.type_id,
-        language: createServiceDto.language
-      });
-
-      if (existingService) {
-        return {
-          code: 1,
-          message: 'Ya existe un servicio con este type_id para este idioma',
-          toast: 1,
-          redirect_url: '',
-          type: 'error',
-          data: null
-        };
-      }
+      createServiceDto.language = 'es';
+      createServiceDto.type_id = await this.getNextTypeId();
 
       const newService = new this.serviceModel(createServiceDto);
       const savedService = await newService.save();
@@ -159,6 +156,12 @@ export class ServicesService {
         data: null
       };
     }
+  }
+  getNextTypeId(): number | PromiseLike<number> {
+
+      return this.serviceModel.findOne({}, {}, { sort: { type_id: -1 } }).then(service => {
+        return service ? service.type_id + 1 : 1;
+      });
   }
 
   /**

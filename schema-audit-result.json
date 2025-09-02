@@ -1,0 +1,70 @@
+{
+  "collections": [
+    {
+      "name": "customers",
+      "type": "collection"
+    },
+    {
+      "name": "tenants",
+      "type": "collection"
+    },
+    {
+      "name": "service_screen_options",
+      "type": "collection"
+    },
+    {
+      "name": "service_month_options",
+      "type": "collection"
+    },
+    {
+      "name": "catalogs",
+      "type": "collection"
+    },
+    {
+      "name": "service_plans",
+      "type": "collection"
+    },
+    {
+      "name": "services",
+      "type": "collection"
+    },
+    {
+      "name": "verification_codes",
+      "type": "collection"
+    },
+    {
+      "name": "accounts",
+      "type": "collection"
+    },
+    {
+      "name": "users",
+      "type": "collection"
+    },
+    {
+      "name": "siteconfigs",
+      "type": "collection"
+    },
+    {
+      "name": "orders",
+      "type": "collection"
+    },
+    {
+      "name": "servicescreenoptions",
+      "type": "collection"
+    },
+    {
+      "name": "webpage_content",
+      "type": "collection"
+    },
+    {
+      "name": "servicemonthoptions",
+      "type": "collection"
+    },
+    {
+      "name": "serviceplans",
+      "type": "collection"
+    }
+  ],
+  "inconsistencies": [],
+  "recommendations": []
+}

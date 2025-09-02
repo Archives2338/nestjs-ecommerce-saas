@@ -1,12 +1,16 @@
 import { Controller, Post, Body, Put, Param, Logger, HttpCode, HttpStatus } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
+import { CatalogPriceDescriptionService } from './services/catalog-price-description.service';
 import { GetTypeClassifyListDto, UpdateCatalogDto } from './dto/catalog.dto';
 
 @Controller('index')
 export class CatalogController {
   private readonly logger = new Logger(CatalogController.name);
   
-  constructor(private readonly catalogService: CatalogService) {}
+  constructor(
+    private readonly catalogService: CatalogService,
+    private readonly catalogPriceDescriptionService: CatalogPriceDescriptionService
+  ) {}
 
   @Post('getTypeClassifyList')
   @HttpCode(HttpStatus.OK)
@@ -59,6 +63,29 @@ export class CatalogController {
       };
     } catch (error) {
       this.logger.error('Error adding recent order:', error);
+      throw error;
+    }
+  }
+
+  @Put('service/:language/:serviceId/price-description')
+  async updateServicePriceAndDescription(
+    @Param('language') language: string,
+    @Param('serviceId') serviceId: number,
+    @Body() updateData: any
+  ) {
+    try {
+      this.logger.log(`Updating service ${serviceId} price and description for language: ${language}`);
+      console.log(`data: ${updateData.description}`);
+      const result = await this.catalogPriceDescriptionService.updateServicePriceAndDescription(
+        language,
+        serviceId,
+        updateData.min_price,
+        updateData.description
+      );
+      this.logger.log('Service price and description updated successfully');
+      return result;
+    } catch (error) {
+      this.logger.error('Error updating service price and description:', error);
       throw error;
     }
   }

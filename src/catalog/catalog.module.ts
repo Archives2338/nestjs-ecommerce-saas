@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CatalogController } from './catalog.controller';
 import { CatalogService } from './catalog.service';
+import { CatalogPriceDescriptionService } from './services/catalog-price-description.service';
 import { Catalog, CatalogSchema } from './schemas/catalog.schema';
 
 @Module({
@@ -11,7 +12,7 @@ import { Catalog, CatalogSchema } from './schemas/catalog.schema';
     ])
   ],
   controllers: [CatalogController],
-  providers: [CatalogService],
-  exports: [CatalogService]
+  providers: [CatalogService, CatalogPriceDescriptionService],
+  exports: [CatalogService, CatalogPriceDescriptionService]
 })
 export class CatalogModule {}

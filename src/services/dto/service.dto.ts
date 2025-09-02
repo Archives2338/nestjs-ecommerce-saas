@@ -1,5 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsBoolean, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Optional } from '@nestjs/common';
 
 export class GetSkuListDto {
   @IsString()
@@ -133,10 +134,10 @@ export class ServicePlansDto {
 }
 
 export class CreateServiceDto {
-  @IsString()
+  @Optional()
   language: string;
 
-  @IsNumber()
+  @Optional()
   type_id: number;
 
   @IsString()

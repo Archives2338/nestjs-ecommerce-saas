@@ -1,0 +1,454 @@
+{
+  "info": {
+    "name": "Sistema Pricing Modular - API Collection",
+    "description": "Colección completa de endpoints para el sistema de pricing modular de servicios de streaming",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "serviceId",
+      "value": "68903254d69fe657139074f2",
+      "type": "string",
+      "description": "Disney+ Service ID"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "Bearer token para autenticación admin"
+    }
+  ],
+  "item": [
+    {
+      "name": "Month Options",
+      "item": [
+        {
+          "name": "Crear Month Option",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": 1,\n  \"month_content\": \"1 mes\",\n  \"sort\": 1,\n  \"is_default\": true,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/month-options/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "month-options", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar Month Options por Servicio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/month-options/service/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "month-options", "service", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Month Option por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/month-options/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "month-options", "1"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar Month Option",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": 3,\n  \"month_content\": \"3 meses\",\n  \"sort\": 2,\n  \"is_default\": false,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/month-options/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "month-options", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar Month Option",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/month-options/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "month-options", "1"]
+            }
+          }
+        },
+        {
+          "name": "Establecer como Predeterminado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/month-options/1/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "month-options", "1", "default"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screen Options",
+      "item": [
+        {
+          "name": "Crear Screen Option",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"max_user\": 1,\n  \"substitute_recharge\": 0,\n  \"screen\": 1,\n  \"screen_content\": \"1 perfil\",\n  \"seat_type\": \"Individual\",\n  \"sort\": 1,\n  \"is_default\": true,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/screen-options/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "screen-options", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar Screen Options por Servicio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/screen-options/service/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "screen-options", "service", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Screen Option por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/screen-options/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "screen-options", "1"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar Screen Option",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"max_user\": 2,\n  \"substitute_recharge\": 1,\n  \"screen\": 2,\n  \"screen_content\": \"2 pantallas\",\n  \"seat_type\": \"Familiar\",\n  \"sort\": 2,\n  \"is_default\": false,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/screen-options/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "screen-options", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar Screen Option",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/screen-options/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "screen-options", "1"]
+            }
+          }
+        },
+        {
+          "name": "Establecer como Predeterminado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/screen-options/1/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "screen-options", "1", "default"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Service Plans",
+      "item": [
+        {
+          "name": "Crear Service Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month_id\": 1,\n  \"screen_id\": 1,\n  \"plan_type\": \"plan\",\n  \"currency_icon1\": \"S/\",\n  \"currency_icon2\": \"PEN\",\n  \"currency_show_type\": 1,\n  \"original_price\": 9.99,\n  \"sale_price\": 7.99,\n  \"average_price\": 7.99,\n  \"discount\": \"20%\",\n  \"sort\": 1,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar Service Plans por Servicio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/service/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "service", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Service Plan por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "1"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Plan por Combinación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/combo/{{serviceId}}/1/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "combo", "{{serviceId}}", "1", "1"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar Service Plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month_id\": 3,\n  \"screen_id\": 1,\n  \"plan_type\": \"plan\",\n  \"currency_icon1\": \"S/\",\n  \"currency_icon2\": \"PEN\",\n  \"currency_show_type\": 1,\n  \"original_price\": 25.99,\n  \"sale_price\": 21.99,\n  \"average_price\": 7.33,\n  \"discount\": \"15%\",\n  \"sort\": 2,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar Service Plan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pricing Integration",
+      "item": [
+        {
+          "name": "Matriz de Precios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/matrix/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "matrix", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Combinaciones Faltantes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/missing/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "missing", "{{serviceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Estadísticas de Pricing",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/services/plans/stats/{{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "services", "plans", "stats", "{{serviceId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
