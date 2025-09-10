@@ -18,18 +18,18 @@ export class ServicesService {
    */
   async getSkuList(getSkuListDto: GetSkuListDto) {
     try {
-      const { language, type_id, source } = getSkuListDto;
-      
-      this.logger.log(`Getting service details for type_id: ${type_id}, language: ${language}, source: ${source}`);
+      const { language, serviceId, source } = getSkuListDto;
+
+      this.logger.log(`Getting service details for serviceId: ${serviceId}, language: ${language}, source: ${source}`);
 
       const service = await this.serviceModel.findOne({
         language,
-        type_id: type_id,
+        serviceId,
         active: true
       }).exec();
 
       if (!service) {
-        throw new NotFoundException(`Service with type_id ${type_id} not found for language ${language}`);
+        throw new NotFoundException(`Service with serviceId ${serviceId} not found for language ${language}`);
       }
 
       // Estructura de respuesta compatible con la API original

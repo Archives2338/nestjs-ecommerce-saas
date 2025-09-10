@@ -29,9 +29,10 @@ const RecentOrderSchema = new MongooseSchema({
   time: { type: String, required: true },
 }, { _id: false });
 
-// Schema para productos/servicios (SPU)
+// Schema para productos/servicios (SPU) - REFACTORIZADO PARA ObjectId
 const SpuSchema = new MongooseSchema({
-  id: { type: Number, required: true },
+  serviceId: { type: MongooseSchema.Types.ObjectId, ref: 'Service', required: true }, // 🎯 ObjectId del servicio (principal)
+  type_id: { type: Number }, // 📋 Mantenido para compatibilidad temporal
   type_name: { type: String, required: true },
   detail_route: { type: String, required: true },
   is_netflix: { type: Boolean, default: false },

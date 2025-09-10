@@ -4,11 +4,13 @@ import { AdminServicesController } from './admin-services.controller';
 import { ServicesService } from '../services/services.service';
 import { Service, ServiceSchema } from '../services/schemas/service.schema';
 import { AdminAuthModule } from './admin-auth.module';
+import { FilesModule } from '../files/files.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
-    AdminAuthModule
+    AdminAuthModule,
+    FilesModule
   ],
   controllers: [AdminServicesController],
   providers: [ServicesService],

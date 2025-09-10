@@ -7,6 +7,7 @@ import { AccountsService } from './accounts.service';
 import { Service, ServiceSchema } from './schemas/service.schema';
 import { Account, AccountSchema } from './schemas/account.schema';
 import { Order, OrderSchema } from '../orders/schemas/order.schema';
+import { Catalog, CatalogSchema } from '../catalog/schemas/catalog.schema';
 import { AdminAuthModule } from '../admin/admin-auth.module';
 
 // Nuevos schemas modulares
@@ -27,6 +28,12 @@ import {
   ServicePricingIntegrationService
 } from './services';
 
+// Servicio de sincronización con catálogos
+import { ServiceCatalogSyncService } from './services/service-catalog-sync.service';
+
+// Servicio de eventos
+import { ServiceEventsService } from './services/service-events.service';
+
 // Nuevos controladores admin
 import {
   AdminMonthOptionsController,
@@ -34,6 +41,9 @@ import {
   AdminServicePlansController,
   AdminServicePricingController
 } from './controllers';
+
+// Controlador de sincronización admin
+import { AdminSyncController } from './controllers/admin-sync.controller';
 
 @Module({
   imports: [
@@ -43,6 +53,7 @@ import {
       { name: Service.name, schema: ServiceSchema },
       { name: Account.name, schema: AccountSchema },
       { name: Order.name, schema: OrderSchema },
+      { name: Catalog.name, schema: CatalogSchema }, // Para ServiceCatalogSyncService
       
       // Nuevos schemas modulares
       { 
@@ -71,7 +82,10 @@ import {
     AdminMonthOptionsController,
     AdminScreenOptionsController,
     AdminServicePlansController,
-    AdminServicePricingController
+    AdminServicePricingController,
+    
+    // Controlador de sincronización
+    AdminSyncController
   ],
   providers: [
     // Servicios originales
@@ -82,7 +96,13 @@ import {
     ServiceMonthOptionService,
     ServiceScreenOptionService,
     ServicePlanService,
-    ServicePricingIntegrationService
+    ServicePricingIntegrationService,
+    
+    // Servicio de sincronización con catálogos
+    ServiceCatalogSyncService,
+    
+    // Servicio de eventos
+    ServiceEventsService
   ],
   exports: [
     // Servicios originales
@@ -93,7 +113,13 @@ import {
     ServiceMonthOptionService,
     ServiceScreenOptionService,
     ServicePlanService,
-    ServicePricingIntegrationService
+    ServicePricingIntegrationService,
+    
+    // Servicio de sincronización con catálogos
+    ServiceCatalogSyncService,
+    
+    // Servicio de eventos
+    ServiceEventsService
   ]
 })
 export class ServicesModule {}

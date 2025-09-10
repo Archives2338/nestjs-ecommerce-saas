@@ -6,8 +6,8 @@ export class GetSkuListDto {
   @IsString()
   language: string;
 
-  @IsNumber()
-  type_id: number;
+  @IsString()
+  serviceId: string;
 
   @IsNumber()
   source: number;

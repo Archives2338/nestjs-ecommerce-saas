@@ -10,11 +10,16 @@ import {
   Logger,
   HttpStatus,
   HttpCode,
-  UseGuards
+  UseGuards,
+  UseInterceptors,
+  UploadedFile
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ServicesService } from '../services/services.service';
 import { CreateServiceDto, UpdateServiceDto } from '../services/dto/service.dto';
+import { CreateServiceMultipartDto, UpdateServiceMultipartDto } from '../services/dto/service-multipart.dto';
 import { AdminJwtAuthGuard } from './guards/admin-jwt-auth.guard';
+import { S3Service } from '../files/s3.service';
 
 /**
  * Controlador para administración de servicios
@@ -25,7 +30,10 @@ import { AdminJwtAuthGuard } from './guards/admin-jwt-auth.guard';
 export class AdminServicesController {
   private readonly logger = new Logger(AdminServicesController.name);
 
-  constructor(private readonly servicesService: ServicesService) {}
+  constructor(
+    private readonly servicesService: ServicesService,
+    private readonly s3Service: S3Service
+  ) {}
 
   /**
    * Listar todos los servicios con información resumida para administración
@@ -139,12 +147,100 @@ export class AdminServicesController {
   /**
    * Crear un nuevo servicio
    * POST /api/admin/services
+   * Acepta un archivo para el ícono que se sube a S3
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createService(@Body() createServiceDto: CreateServiceDto) {
+  @UseInterceptors(FileInterceptor('icon'))
+  async createService(
+    @Body() createServiceMultipartDto: CreateServiceMultipartDto,
+    @UploadedFile() iconFile?: Express.Multer.File
+  ) {
     try {
-      this.logger.log(`Creating new service: ${createServiceDto.name}`);
+      this.logger.log(`Creating new service: ${createServiceMultipartDto.name}`);
+      
+      // Transformar el DTO multipart al DTO normal
+      const createServiceDto: CreateServiceDto = {
+        language: createServiceMultipartDto.language || 'es',
+        type_id: createServiceMultipartDto.type_id || Math.floor(Math.random() * 1000000),
+        icon: '', // Se llenará después si hay archivo
+        name: createServiceMultipartDto.name,
+        subtitle: createServiceMultipartDto.subtitle,
+        content: createServiceMultipartDto.content,
+        type: createServiceMultipartDto.type,
+        url: createServiceMultipartDto.url || '',
+        privacy_url: createServiceMultipartDto.privacy_url || '',
+        term_url: createServiceMultipartDto.term_url || '',
+        refund_url: createServiceMultipartDto.refund_url || '',
+        promotion_url: createServiceMultipartDto.promotion_url || '',
+        plan: createServiceMultipartDto.plan || {
+          month: [],
+          screen: [],
+          default_month_id: null,
+          default_screen_id: null
+        },
+        repayment: createServiceMultipartDto.repayment || {
+          month: [],
+          screen: [],
+          default_month_id: null,
+          default_screen_id: null
+        },
+        sort: createServiceMultipartDto.sort || 0,
+        active: createServiceMultipartDto.active !== undefined ? createServiceMultipartDto.active : true
+      };
+      
+      // Si se subió un archivo de ícono, procesarlo
+      if (iconFile) {
+        this.logger.log(`Processing icon file: ${iconFile.originalname}`);
+        
+        // Validar que sea una imagen
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+        if (!this.s3Service.validateFileType(iconFile, allowedTypes)) {
+          return {
+            code: 1,
+            message: 'El archivo del ícono debe ser una imagen (JPEG, PNG, GIF, WebP, SVG)',
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+
+        // Validar tamaño (máximo 5MB para íconos)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (!this.s3Service.validateFileSize(iconFile, maxSize)) {
+          return {
+            code: 1,
+            message: 'El archivo del ícono es demasiado grande (máximo 5MB)',
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+
+        // Subir archivo a S3 en carpeta específica para íconos de servicios
+        const uploadResult = await this.s3Service.uploadFile(iconFile, 'service-icons');
+        
+        if (!uploadResult.success) {
+          this.logger.error('Error uploading icon to S3:', uploadResult.error);
+          return {
+            code: 1,
+            message: `Error al subir el ícono: ${uploadResult.error}`,
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+
+        // Asignar la URL de S3 al DTO
+        createServiceDto.icon = uploadResult.url!;
+        this.logger.log(`Icon uploaded successfully: ${uploadResult.url}`);
+      } else {
+        // Si no hay archivo, usar el valor del DTO multipart si existe
+        createServiceDto.icon = createServiceMultipartDto.icon || '';
+      }
       
       const result = await this.servicesService.createService(createServiceDto);
 
@@ -172,16 +268,87 @@ export class AdminServicesController {
   /**
    * Actualizar un servicio existente
    * PUT /api/admin/services/:id
+   * También acepta un archivo para actualizar el ícono
    */
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('icon'))
   async updateService(
     @Param('id') id: string,
-    @Body() updateServiceDto: UpdateServiceDto,
-    @Query('language') language: string = 'es'
+    @Body() updateServiceMultipartDto: UpdateServiceMultipartDto,
+    @Query('language') language: string = 'es',
+    @UploadedFile() iconFile?: Express.Multer.File
   ) {
     try {
       this.logger.log(`Updating service ID: ${id}`);
+      
+      // Transformar el DTO multipart al DTO normal
+      const updateServiceDto: UpdateServiceDto = {
+        icon: updateServiceMultipartDto.icon,
+        name: updateServiceMultipartDto.name,
+        subtitle: updateServiceMultipartDto.subtitle,
+        content: updateServiceMultipartDto.content,
+        type: updateServiceMultipartDto.type,
+        url: updateServiceMultipartDto.url,
+        privacy_url: updateServiceMultipartDto.privacy_url,
+        term_url: updateServiceMultipartDto.term_url,
+        refund_url: updateServiceMultipartDto.refund_url,
+        promotion_url: updateServiceMultipartDto.promotion_url,
+        plan: updateServiceMultipartDto.plan,
+        repayment: updateServiceMultipartDto.repayment,
+        sort: updateServiceMultipartDto.sort,
+        active: updateServiceMultipartDto.active
+      };
+      
+      // Si se subió un nuevo archivo de ícono, procesarlo
+      if (iconFile) {
+        this.logger.log(`Processing new icon file: ${iconFile.originalname}`);
+        
+        // Validar que sea una imagen
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+        if (!this.s3Service.validateFileType(iconFile, allowedTypes)) {
+          return {
+            code: 1,
+            message: 'El archivo del ícono debe ser una imagen (JPEG, PNG, GIF, WebP, SVG)',
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+
+        // Validar tamaño (máximo 5MB para íconos)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (!this.s3Service.validateFileSize(iconFile, maxSize)) {
+          return {
+            code: 1,
+            message: 'El archivo del ícono es demasiado grande (máximo 5MB)',
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+
+        // Subir nuevo archivo a S3
+        const uploadResult = await this.s3Service.uploadFile(iconFile, 'service-icons');
+        
+        if (!uploadResult.success) {
+          this.logger.error('Error uploading new icon to S3:', uploadResult.error);
+          return {
+            code: 1,
+            message: `Error al subir el nuevo ícono: ${uploadResult.error}`,
+            toast: 1,
+            redirect_url: '',
+            type: 'error',
+            data: null
+          };
+        }
+
+        // Asignar la nueva URL de S3 al DTO
+        updateServiceDto.icon = uploadResult.url!;
+        this.logger.log(`New icon uploaded successfully: ${uploadResult.url}`);
+      }
       
       // Buscar el servicio por ID de MongoDB
       const service = await this.servicesService.getServiceById(id);

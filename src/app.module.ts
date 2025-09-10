@@ -17,6 +17,7 @@ import { AdminPaymentValidationModule } from './admin/admin-payment-validation.m
 import { AdminAuthModule } from './admin/admin-auth.module';
 import { AdminServicesModule } from './admin/admin-services.module';
 import { TestModule } from './test/test.module';
+import { FilesModule } from './files/files.module';
 import { getDatabaseConfig } from './config/database.config';
 
 @Module({
@@ -66,6 +67,7 @@ import { getDatabaseConfig } from './config/database.config';
     AdminAuthModule,
     AdminServicesModule,
     TestModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

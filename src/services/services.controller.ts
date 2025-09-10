@@ -31,7 +31,7 @@ export class ServicesController {
   @HttpCode(HttpStatus.OK)
   async getSkuList(@Body() getSkuListDto: GetSkuListDto) {
     try {
-      this.logger.log(`Getting SKU list for type_id: ${getSkuListDto.type_id}, language: ${getSkuListDto.language}`);
+      this.logger.log(`Getting SKU list for serviceId: ${getSkuListDto.serviceId}, language: ${getSkuListDto.language}`);
       return await this.servicesService.getSkuList(getSkuListDto);
     } catch (error) {
       this.logger.error('Error in getSkuList endpoint:', error);
@@ -59,7 +59,7 @@ export class ServicesController {
     try {
       const getSkuListDto: GetSkuListDto = {
         language,
-        type_id: parseInt(id),
+        serviceId: id,
         source
       };
       return await this.servicesService.getSkuList(getSkuListDto);

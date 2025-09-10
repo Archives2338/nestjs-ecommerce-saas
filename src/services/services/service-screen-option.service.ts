@@ -9,6 +9,7 @@ import {
   CreateServiceScreenOptionDto, 
   UpdateServiceScreenOptionDto 
 } from '../dto/service-plans.dto';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class ServiceScreenOptionService {
@@ -70,25 +71,18 @@ export class ServiceScreenOptionService {
   }
 
   async update(screenId: number, updateDto: UpdateServiceScreenOptionDto) {
+    console.log('Updating screen option:', screenId);
+    console.log('With data:', updateDto);
     const option = await this.findOne(screenId);
-    
+    console.log('Updating screen option:', option);
     // Si se está actualizando el número de pantallas, verificar que no entre en conflicto
-    if (updateDto.screen && updateDto.screen !== option.screen) {
-      const existing = await this.screenOptionModel.findOne({
-        serviceId: option.serviceId,
-        screen: updateDto.screen,
-        screen_id: { $ne: screenId }
-      }).exec();
-
-      if (existing) {
-        throw new ConflictException(
-          `Ya existe una opción de ${updateDto.screen} pantalla(s) para este servicio`
-        );
-      }
+    if (updateDto) {
+      Object.assign(option, updateDto);
+      console.log('Updated screen option:', option);
+      return await option.save();
     }
 
-    Object.assign(option, updateDto);
-    return await option.save();
+    return throwError(() => new ConflictException('Error al actualizar la opción de pantalla'));
   }
 
   async remove(screenId: number) {

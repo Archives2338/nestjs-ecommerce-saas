@@ -18,16 +18,16 @@ export class ServicesService {
    */
   async getSkuList(getSkuListDto: GetSkuListDto) {
     try {
-      const { language, type_id, source } = getSkuListDto;
-      
-      this.logger.log(`Getting service details for type_id: ${type_id}, language: ${language}, source: ${source}`);
+      const { language, serviceId, source } = getSkuListDto;
+
+      this.logger.log(`Getting service details for serviceId: ${serviceId}, language: ${language}, source: ${source}`);
 
       const service = await this.serviceModel.findOne({
         language,
-        type_id: type_id,
+        _id: serviceId,
         active: true
       }).exec();
-
+      console.log('Servicio encontrado:', service);
       // Filtrar arrays vacíos en plan.month y plan.screen
       if (service && service.plan) {
         if (Array.isArray(service.plan.month)) {
@@ -38,9 +38,15 @@ export class ServicesService {
         }
       }
       if (!service) {
-        throw new NotFoundException(`Service with type_id ${type_id} not found for language ${language}`);
+        throw new NotFoundException(`Service with serviceId ${serviceId} not found for language ${language}`);
       }
+      console.log("service",service
 
+      )
+      if(service.plan.month.length === 0 && service.plan.screen.length === 0) {
+        this.logger.warn(`Service with serviceId ${serviceId} has empty plan.month and plan.screen`);
+        throw new NotFoundException(`Service with serviceId ${serviceId} has no available plans`);
+      }
       // Estructura de respuesta compatible con la API original
       return {
         code: 0,
@@ -94,7 +100,7 @@ export class ServicesService {
         redirect_url: '',
         type: 'success',
         data: services.map(service => ({
-          id: service.type_id,
+          id: service.id,
           type_name: service.name,
           thumb_img: service.icon,
           show_status: service.active ? 1 : 0,
@@ -481,6 +487,26 @@ export class ServicesService {
 
     } catch (error) {
       this.logger.error('Error getting services stats:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener servicio por ID para uso en catálogo (devuelve estructura completa)
+   */
+  async getServiceByIdForCatalog(id: string) {
+    try {
+      const service = await this.serviceModel.findById(id).exec();
+      
+      if (!service) {
+        throw new NotFoundException(`Service with ID ${id} not found`);
+      }
+
+      // Devolver el objeto completo del servicio sin modificaciones
+      return service.toObject();
+
+    } catch (error) {
+      this.logger.error(`Error getting service by ID for catalog ${id}:`, error);
       throw error;
     }
   }

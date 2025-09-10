@@ -18,7 +18,7 @@ export class CatalogPriceDescriptionService {
    * @param min_price Nuevo precio mínimo
    * @param description Nuevo array de descripción
    */
-  async updateServicePriceAndDescription(language: string, serviceId: number, min_price: number, description: string[]) {
+  async updateServicePriceAndDescription(language: string, serviceId: string, min_price: number, description: string[]) {
     try {
       const catalog = await this.catalogModel.findOne({ language }).exec();
       if (!catalog) {
@@ -35,8 +35,8 @@ export class CatalogPriceDescriptionService {
       for (const category of catalog.list) {
         console.log(`Revisando categoría: ${category.name || 'Sin nombre'}`);
         for (const service of category.spuList) {
-          console.log(`Servicio encontrado - ID: ${service.id}, Nombre: ${service.name || 'Sin nombre'}`);
-          if (service.id === serviceId) {
+          console.group("service", service);
+          if (service.serviceId.toString() === serviceId) {
             console.log(`¡Servicio ${serviceId} encontrado! Actualizando...`);
             service.min_price = min_price;
             service.description = description;

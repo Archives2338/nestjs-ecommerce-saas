@@ -1,4 +1,18 @@
-import { IsString, IsNumber, IsBoolean, IsOptional, ValidateNested, IsArray } from 'class-validator';
+import { IsString, IsNumber, IsBoolean, IsOptional, Valiexport class SpuDto {
+  @IsString()
+  @IsOptional()
+  serviceId?: string; // 🎯 ObjectId del servicio (principal) - opcional por compatibilidad
+
+  @IsNumber()
+  @IsOptional()
+  type_id?: number; // 📋 Mantenido para compatibilidad temporal
+
+  @IsString()
+  @IsOptional()
+  serviceRef?: string; // 🔗 Referencia legacy - opcional por compatibilidad
+
+  @IsString()
+  type_name: string;, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ClassifyTabDto {
@@ -56,16 +70,11 @@ export class RecentOrderDto {
 
 export class SpuDto {
   @IsString()
-  @IsOptional()
-  serviceId?: string; // 🎯 ObjectId del servicio (principal) - opcional por compatibilidad
+  serviceId: string; // 🎯 ObjectId del servicio (principal)
 
   @IsNumber()
   @IsOptional()
-  type_id?: number; // 📋 Mantenido para compatibilidad temporal
-
-  @IsString()
-  @IsOptional()
-  serviceRef?: string; // 🔗 Referencia legacy - opcional por compatibilidad
+  type_id?: number; // � Mantenido para compatibilidad temporal
 
   @IsString()
   type_name: string;
@@ -116,9 +125,9 @@ export class SpuDto {
   rank?: number;
 
   @IsArray()
-  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => RecentOrderDto)
+  @IsOptional()
   recent_order?: RecentOrderDto[];
 
   @IsArray()
@@ -134,48 +143,43 @@ export class CategoryListDto {
   @IsNumber()
   id: number;
 
-  @IsString()
-  @IsOptional()
-  type_name?: string;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SpuDto)
-  spuList: SpuDto[];
+  @IsOptional()
+  spuList?: SpuDto[];
 }
 
 export class GetTypeClassifyListDto {
   @IsString()
   language: string;
 
-  @IsString()
   @IsOptional()
   promote?: string;
 }
 
 export class UpdateCatalogDto {
   @IsArray()
-  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => ClassifyTabDto)
+  @IsOptional()
   classify_tab?: ClassifyTabDto[];
 
-  @IsOptional()
   @ValidateNested()
   @Type(() => StatisticsDto)
+  @IsOptional()
   statistics?: StatisticsDto;
 
   @IsArray()
-  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CategoryListDto)
+  @IsOptional()
   list?: CategoryListDto[];
 
   @IsString()
   @IsOptional()
   language?: string;
 
-  @IsString()
   @IsOptional()
   promote?: string;
 }
