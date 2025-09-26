@@ -3,6 +3,7 @@ import { CatalogService } from './catalog.service';
 import { CatalogPriceDescriptionService } from './services/catalog-price-description.service';
 import { ServicesService } from '../services/services.service';
 import { GetTypeClassifyListDto, UpdateCatalogDto, SpuDto } from './dto/catalog.dto';
+import { UpdateServicePriceDescriptionDto } from './dto/update-service-price-description.dto';
 
 @Controller('index')
 export class CatalogController {
@@ -69,20 +70,59 @@ export class CatalogController {
   //   }
   // }
 
-  @Put('service/:language/:serviceId/price-description')
+ // unlock service for catalog
+
+  @Put('catalog/:serviceId/unlock')
+  async unlockServiceForCatalog(
+    @Param('serviceId') serviceId: string
+  ) {
+    try {
+      const result = await this.catalogService.unlockServiceForCatalog(serviceId);
+      this.logger.log('Service unlocked successfully');
+      return result;
+    } catch (error) {
+      this.logger.error('Error unlocking service:', error);
+      throw error;
+    }
+  }
+
+  //lock service for catalog
+  
+  @Put('catalog/:serviceId/lock')
+  async lockServiceForCatalog(
+    @Param('serviceId') serviceId: string
+  ) {
+    try {
+      const result = await this.catalogService.lockServiceForCatalog(serviceId);
+      this.logger.log('Service locked successfully');
+      return result;
+    } catch (error) {
+      this.logger.error('Error locking service:', error);
+      throw error;
+    }
+  }
+
+  @Put('catalog/service/:language/:serviceId/price-description')
   async updateServicePriceAndDescription(
     @Param('language') language: string,
     @Param('serviceId') serviceId: string,
-    @Body() updateData: any
+    @Body() updateData: UpdateServicePriceDescriptionDto
   ) {
     try {
       this.logger.log(`Updating service ${serviceId} price and description for language: ${language}`);
-      console.log(`data: ${updateData.description}`);
+      console.log(`Data received:`, JSON.stringify({
+        min_price: updateData.min_price,
+        description: updateData.description,
+        description_short: updateData.description_short
+      }, null, 2));
+      
       const result = await this.catalogPriceDescriptionService.updateServicePriceAndDescription(
         language,
         serviceId,
         updateData.min_price,
-        updateData.description
+        updateData.description,
+        updateData.description_short,
+        updateData.show_price 
       );
       this.logger.log('Service price and description updated successfully');
       return result;

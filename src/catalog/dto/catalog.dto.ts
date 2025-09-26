@@ -125,6 +125,15 @@ export class SpuDto {
   @IsOptional()
   description?: string[];
 
+  @IsString()
+  @IsOptional()
+  description_short?: string;
+
+
+  
+  @IsOptional()
+  show_price?: boolean;
+
   @IsArray()
   @IsOptional()
   prompt?: string[];

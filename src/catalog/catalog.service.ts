@@ -1038,4 +1038,53 @@ export class CatalogService {
       throw error;
     }
   }
-}
+
+
+   async unlockServiceForCatalog(serviceId: string) {
+    try {
+      this.logger.log(`Unlocking service ${serviceId} in all catalogs`);
+      
+      const catalogs = await this.catalogModel.find({ 'list.spuList.serviceId': serviceId }).exec();
+
+      for (const catalog of catalogs) {
+        const spu = catalog.list.flatMap(cat => cat.spuList).find((spu: any) => spu.serviceId.toString() === serviceId.toString());
+        console.log("spu to unlock", spu);
+        if (spu) {
+          spu.lock_status = 0; // Unlock the service
+          this.logger.log(`Service ${serviceId} unlocked in catalog ${catalog._id}`);
+        }
+      }
+      console.log("catalogs to update", catalogs);
+      await this.catalogModel.bulkSave(catalogs);
+      this.logger.log('All catalogs updated successfully');
+    } catch (error) {
+      this.logger.error('Error unlocking service in catalogs:', error);
+      throw error;
+    }
+    
+    }
+
+  async lockServiceForCatalog(serviceId: string) {
+    try {
+      this.logger.log(`Locking service ${serviceId} in all catalogs`);
+      
+      const catalogs = await this.catalogModel.find({ 'list.spuList.serviceId': serviceId }).exec();
+
+      for (const catalog of catalogs) {
+        const spu = catalog.list.flatMap(cat => cat.spuList).find((spu: any) => spu.serviceId.toString() === serviceId.toString());
+        console.log("spu to lock", spu);
+        if (spu) {
+          spu.lock_status = 1; // Lock the service
+          this.logger.log(`Service ${serviceId} locked in catalog ${catalog._id}`);
+        }
+      }
+      console.log("catalogs to update", catalogs);
+      await this.catalogModel.bulkSave(catalogs);
+      this.logger.log('All catalogs updated successfully');
+    } catch (error) {
+      this.logger.error('Error locking service in catalogs:', error);
+      throw error;
+    }
+    
+    }
+  }

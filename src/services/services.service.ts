@@ -310,7 +310,7 @@ export class ServicesService {
         language,
         type_id
       });
-
+      console.log("service",service)
       if (!service) {
         throw new NotFoundException(`Service with type_id ${type_id} not found for language ${language}`);
       }

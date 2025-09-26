@@ -38,16 +38,16 @@ export class PlanItem {
   @Prop({ required: true })
   type_plan_id: number;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: 0 }) // 🔧 Cambiado a opcional con default
   sort: number;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: '$' }) // 🔧 Cambiado a opcional con default
   currency_icon1: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: 'USD($)' }) // 🔧 Cambiado a opcional con default
   currency_icon2: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: 1 }) // 🔧 Cambiado a opcional con default
   currency_show_type: number;
 
   @Prop({ required: true })
@@ -59,7 +59,7 @@ export class PlanItem {
   @Prop({ required: true })
   average_price: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: '0' }) // 🔧 Cambiado a opcional con default
   discount: string;
 }
 
@@ -86,7 +86,7 @@ export class ScreenOption {
   @Prop({ required: true })
   seat_type: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: 0 }) // 🔧 Cambiado a opcional con default
   sort: number;
 
   @Prop({ type: [PlanItemSchema], default: [] })
@@ -179,7 +179,7 @@ export class Service {
   @Prop({ type: ServicePlansSchema, required: true })
   repayment: ServicePlans;
 
-  @Prop({ required: false })
+  @Prop({ required: false, default: 0 }) // 🔧 Agregado default
   sort?: number;
 
   @Prop({ default: true })

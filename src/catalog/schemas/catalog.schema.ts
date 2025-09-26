@@ -48,6 +48,8 @@ const SpuSchema = new MongooseSchema({
   rank: { type: Number, default: 0 },
   recent_order: { type: [RecentOrderSchema], default: [] },
   description: { type: [String], default: [] },
+  description_short: { type: String, default: '' }, // 📝 Nueva descripción corta
+  show_price: { type: Boolean, default: true },
   prompt: { type: [String], default: [] },
 }, { _id: false });
 
