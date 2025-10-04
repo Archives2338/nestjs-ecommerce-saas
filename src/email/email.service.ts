@@ -90,7 +90,7 @@ export class EmailService {
             
             <!-- Header -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
-              <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" width="150" height="25" alt="GamsGo" style="margin-bottom: 20px;" />
+              <img src="https://mybucketimperio.s3.us-east-2.amazonaws.com/comprobantes/1cd8af67-f3b4-4839-82df-66f70a992519.png" width="150" height="25" alt="GamsGo" style="margin-bottom: 20px;" />
               <h1 style="color: white; margin: 0; font-size: 24px;">Código de Verificación</h1>
             </div>
             
@@ -136,7 +136,7 @@ export class EmailService {
             
             <!-- Header -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
-              <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" width="150" height="25" alt="GamsGo" style="margin-bottom: 20px;" />
+              <img src="https://mybucketimperio.s3.us-east-2.amazonaws.com/comprobantes/1cd8af67-f3b4-4839-82df-66f70a992519.png" width="150" height="25" alt="GamsGo" style="margin-bottom: 20px;" />
               <h1 style="color: white; margin: 0; font-size: 24px;">Verification Code</h1>
             </div>
             

@@ -55,8 +55,8 @@ export class CreateOrderDto {
 }
 
 export class UpdateOrderStatusDto {
-  @IsEnum(['pendiente', 'pagado', 'completado', 'cancelado', 'verificacion_manual'])
-  status: 'pendiente' | 'pagado' | 'completado' | 'cancelado' | 'verificacion_manual';
+  @IsEnum(['pendiente', 'pagado', 'cancelado', 'verificacion_manual'])
+  status: 'pendiente' | 'pagado' | 'cancelado' | 'verificacion_manual';
 
   @IsOptional()
   @IsString()

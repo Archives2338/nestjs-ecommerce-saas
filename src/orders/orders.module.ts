@@ -10,6 +10,7 @@ import { Service, ServiceSchema } from '../services/schemas/service.schema';
 import { OcrService } from './ocr.service';
 import { CustomerJwtStrategy } from './customer-jwt.strategy';
 import { CustomerAuthModule } from '../customers/customer-auth.module';
+import { FilesModule } from '../files/files.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { CustomerAuthModule } from '../customers/customer-auth.module';
       }),
       inject: [ConfigService],
     }),
-    forwardRef(() => CustomerAuthModule)
+    forwardRef(() => CustomerAuthModule),
+    FilesModule
   ],
   providers: [OrdersService, OcrService, CustomerJwtStrategy],
   controllers: [OrdersController],

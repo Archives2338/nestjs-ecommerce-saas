@@ -105,7 +105,7 @@ export class GamsGoEmailService {
           <html>
           <head><meta charset="utf-8"><title>Verificación</title></head>
           <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" width="150" alt="GamsGo" />
+            <img src="https://mybucketimperio.s3.us-east-2.amazonaws.com/comprobantes/1cd8af67-f3b4-4839-82df-66f70a992519.png" width="150" alt="GamsGo" />
             <h1>¡Hola ${data.userName}!</h1>
             <p>Tu código de verificación es:</p>
             <div style="background: #f0f0f0; padding: 20px; border-radius: 8px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 4px; margin: 20px 0;">
@@ -122,7 +122,7 @@ export class GamsGoEmailService {
           <html>
           <head><meta charset="utf-8"><title>Bienvenido</title></head>
           <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" width="150" alt="GamsGo" />
+            <img src="https://mybucketimperio.s3.us-east-2.amazonaws.com/comprobantes/1cd8af67-f3b4-4839-82df-66f70a992519.png" width="150" alt="GamsGo" />
             <h1>¡Bienvenido ${data.userName}!</h1>
             <p>Tu cuenta ha sido activada exitosamente.</p>
             ${data.serviceName ? `<p><strong>Servicio:</strong> ${data.serviceName}</p>` : ''}
@@ -137,7 +137,7 @@ export class GamsGoEmailService {
           <html>
           <head><meta charset="utf-8"><title>Credenciales</title></head>
           <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <img src="https://gamsgo.oss-us-east-1.aliyuncs.com/GamsGo.png" width="150" alt="GamsGo" />
+            <img src="https://mybucketimperio.s3.us-east-2.amazonaws.com/comprobantes/1cd8af67-f3b4-4839-82df-66f70a992519.png" width="150" alt="GamsGo" />
             <h1>🔑 Sus credenciales están listas!</h1>
             <p><strong>Hola ${data.userName}</strong>,</p>
             <p>Orden #${data.orderNumber || 'N/A'} procesada exitosamente.</p>

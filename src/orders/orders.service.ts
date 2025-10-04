@@ -1,16 +1,24 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { OcrService } from './ocr.service';
+import { S3Service } from '../files/s3.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Order, OrderDocument, OrderStatus } from './schemas/order.schema';
 import { Service, ServiceDocument } from '../services/schemas/service.schema';
 import { CreateOrderDto, UpdateOrderStatusDto, AttachComprobanteDto } from './dto/create-order.dto';
 
+// Tipo para archivos Multer
 interface MulterFile {
   buffer?: Buffer;
   originalname: string;
   mimetype: string;
   size: number;
+  fieldname?: string;
+  encoding?: string;
+  stream?: any;
+  destination?: string;
+  filename?: string;
+  path?: string;
 }
 
 @Injectable()
@@ -20,7 +28,8 @@ export class OrdersService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
-    private readonly ocrService: OcrService
+    private readonly ocrService: OcrService,
+    private readonly s3Service: S3Service
   ) {}
 
   /**
@@ -104,6 +113,7 @@ export class OrdersService {
         orderId, 
         { 
           ostatus: statusMap[updateDto.status] || 1,
+          order_status: updateDto.status === 'pagado' ? 'active' : updateDto.status === 'cancelado' ? 'canceled' : 'pending',
           ...(updateDto.status === 'pagado' && {
             service_start_time: new Date().toLocaleDateString('es-PE'),
             service_end_time: this.calculateServiceEndDate(30) // 30 días por defecto
@@ -126,22 +136,45 @@ export class OrdersService {
   }
 
   /**
-   * Adjuntar comprobante con análisis OCR
+   * Adjuntar comprobante subiendo a AWS S3 (MVP sin OCR)
    */
   async attachComprobante(orderId: string, file: MulterFile, attachDto: AttachComprobanteDto): Promise<Order | null> {
     try {
       console.log('🔍 Attaching comprobante to order:', orderId, 'with file:', file.originalname);
-      let ocrText: string | undefined = undefined;
+      let comprobanteUrl = '';
       
       if (file?.buffer) {
-        // Procesar OCR
-        ocrText = await this.ocrService.extractText(file.buffer);
-        this.logger.log(`OCR processed for order ${orderId}`);
+        // 📁 Subir archivo a AWS S3 en carpeta 'comprobantes'
+        this.logger.log(`Uploading comprobante to S3 for order ${orderId}`);
+        
+        // Crear objeto compatible con Express.Multer.File
+        const multerFile: Express.Multer.File = {
+          buffer: file.buffer,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          fieldname: file.fieldname || 'comprobante',
+          encoding: file.encoding || '7bit',
+          stream: file.stream || null,
+          destination: file.destination || '',
+          filename: file.filename || file.originalname,
+          path: file.path || ''
+        };
+        
+        const uploadResult = await this.s3Service.uploadFile(multerFile, 'comprobantes');
+        
+        if (uploadResult.success && uploadResult.url) {
+          comprobanteUrl = uploadResult.url;
+          this.logger.log(`Comprobante uploaded to S3: ${comprobanteUrl}`);
+        } else {
+          this.logger.error(`Failed to upload comprobante to S3: ${uploadResult.error}`);
+          throw new Error('Error subiendo comprobante a S3');
+        }
       }
 
       const updateData = {
-        comprobanteUrl: attachDto.comprobanteUrl || `uploads/${orderId}_${Date.now()}.jpg`,
-        comprobanteOcrText: ocrText,
+        comprobanteUrl: comprobanteUrl || attachDto.comprobanteUrl || `uploads/${orderId}_${Date.now()}.jpg`,
+        comprobanteOcrText: 'pronto validaremos', // 🔧 MVP: Texto hardcodeado en lugar de OCR
         paymentReference: attachDto.paymentReference,
         paymentAmount: attachDto.paymentAmount,
         ostatus: 3 // Verificando comprobante
@@ -153,7 +186,7 @@ export class OrdersService {
         throw new NotFoundException('Order not found');
       }
 
-      this.logger.log(`Comprobante attached to order ${orderId}`);
+      this.logger.log(`Comprobante attached to order ${orderId} with S3 URL: ${comprobanteUrl}`);
       return order;
 
     } catch (error) {
